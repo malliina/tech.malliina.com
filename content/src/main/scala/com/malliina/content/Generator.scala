@@ -9,7 +9,7 @@ object Generator {
   def main(args: Array[String]): Unit = run()
 
   def run() = {
-    val current = Paths.get(".")
+    val current = Paths.get("target").resolve("docs")
     val ext = ".md"
     val mds =
       Files.list(current).iterator().asScala.filter(_.getFileName.toString.endsWith(ext)).toList

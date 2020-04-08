@@ -12,13 +12,10 @@ class Pages {
           rel := "stylesheet",
           href := "https://fonts.googleapis.com/css?family=Open+Sans:400,600,300"
         ),
-        link(
-          rel := "stylesheet",
-          href := "https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap"
-        ),
-        link(rel := "stylesheet", href := "css/site.css"),
-        link(rel := "stylesheet", href := "css/monokai.css"),
-        script(src := "js/highlight.pack.js"),
+        styleAt("styles-fonts.css"),
+        styleAt("styles-main.css"),
+        scriptAt("main.js"),
+        scriptAt("highlight.pack.js"),
         script("hljs.initHighlightingOnLoad();")
       ),
       body(
@@ -26,4 +23,11 @@ class Pages {
       )
     )
   )
+
+  def styleAt(file: String) = link(
+    rel := "stylesheet",
+    href := s"assets/css/$file"
+  )
+
+  def scriptAt(file: String) = script(src := s"assets/$file")
 }
