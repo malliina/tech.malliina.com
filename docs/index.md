@@ -11,7 +11,7 @@ import scala.concurrent.Future
 
 Here's some code:
 
-```scala
+```scala mdoc:compile-only
 val a = 42
 val file = Paths.get("hmm.txt")
 // This is a Future

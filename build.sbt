@@ -1,3 +1,5 @@
+import play.sbt.PlayImport
+
 val scala212 = "2.12.10"
 val scala213 = "2.13.1"
 
@@ -6,10 +8,22 @@ val npmBuild = taskKey[Unit]("npm run build")
 val frontendDirectory = settingKey[File]("frontend base dir")
 frontendDirectory in ThisBuild := baseDirectory.value / "frontend"
 
+val code = project
+  .in(file("code"))
+  .enablePlugins(PlayScala)
+  .settings(
+    scalaVersion := scala212,
+    libraryDependencies ++= Seq(
+      PlayImport.ws,
+      "org.scalameta" %% "munit" % "0.7.1" % Test
+    ),
+    testFrameworks += new TestFramework("munit.Framework")
+  )
+
 val docs = project
   .in(file("mdoc"))
   .enablePlugins(MdocPlugin)
-  //  .dependsOn(content)
+  .dependsOn(code, code % "compile->test")
   .settings(
     organization := "com.malliina",
     scalaVersion := scala212,
@@ -42,11 +56,14 @@ val content = project
         (frontendDirectory in ThisBuild).value / "src",
         "*.ts" || "*.scss",
         HiddenFileFilter
-      )
+      ),
+      WatchSource((mdocIn in docs).value)
     ),
-    run := (run in Compile).dependsOn((mdoc in docs).toTask(""), npmBuild).evaluated
+    run := (run in Compile)
+      .dependsOn((mdoc in docs).toTask(""), npmBuild)
+      .evaluated
   )
 
-val blog = project.in(file(".")).aggregate(docs, content)
+val blog = project.in(file(".")).aggregate(code, docs, content)
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
