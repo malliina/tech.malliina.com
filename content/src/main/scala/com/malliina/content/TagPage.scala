@@ -3,7 +3,6 @@ package com.malliina.content
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, StandardOpenOption}
 
-import org.slf4j.LoggerFactory
 import scalatags.Text
 
 case class TagPage(tags: Text.TypedTag[String]) {
@@ -13,7 +12,7 @@ case class TagPage(tags: Text.TypedTag[String]) {
 }
 
 object TagPage {
-  val log = LoggerFactory.getLogger(getClass)
+  val log = AppLogger(getClass)
   val DocTypeTag = "<!DOCTYPE html>"
 
   def write(page: TagPage, to: Path): Path = {

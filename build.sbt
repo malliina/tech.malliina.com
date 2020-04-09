@@ -3,6 +3,8 @@ val scala213 = "2.13.1"
 
 val npm = taskKey[NPM]("NPM interface")
 val npmBuild = taskKey[Unit]("npm run build")
+val frontendDirectory = settingKey[File]("frontend base dir")
+frontendDirectory in ThisBuild := baseDirectory.value / "frontend"
 
 val docs = project
   .in(file("mdoc"))
@@ -30,11 +32,18 @@ val content = project
       "ch.qos.logback" % "logback-core" % "1.2.3"
     ),
     npm := new NPM(
-      (baseDirectory in ThisBuild).value / "frontend",
+      (frontendDirectory in ThisBuild).value,
       target.value,
       streams.value.log
     ),
     npmBuild := npm.value.build(),
+    watchSources := watchSources.value ++ Seq(
+      WatchSource(
+        (frontendDirectory in ThisBuild).value / "src",
+        "*.ts" || "*.scss",
+        HiddenFileFilter
+      )
+    ),
     run := (run in Compile).dependsOn((mdoc in docs).toTask(""), npmBuild).evaluated
   )
 

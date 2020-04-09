@@ -9,12 +9,9 @@ html {
 }
 
 body {
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 10px;
-
   font-family: 'Open Sans', sans-serif;
+  height: 100%;
+  background: ghostwhite;
 }
 
 h1 {
@@ -29,6 +26,15 @@ h2 {
 pre {
   margin-top: 16px;
   margin-bottom: 16px;
+}
+
+.content {
+  height: 100%;
+  background: white;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 10px;
 }
 
 .language-scala {

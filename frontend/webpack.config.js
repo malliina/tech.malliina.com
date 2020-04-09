@@ -10,6 +10,7 @@ module.exports = {
     fonts: [path.resolve(cssDir, './fonts.ts')],
   },
   output: {
+    filename: '[name]-[contenthash].js',
     path: path.resolve(rootDir, '../dist/assets')
   },
   mode: "production",
@@ -23,7 +24,7 @@ module.exports = {
 
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/styles-[name].css',
+      filename: 'css/styles-[name]-[hash].css',
       chunkFilename: 'styles-[id].css'
     })
   ],
