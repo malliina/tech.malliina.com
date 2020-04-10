@@ -29,6 +29,10 @@ case class WebsiteFile(file: Path, cacheControl: CacheControl) {
   def uri = file.toString.replace("\\", "/")
 }
 
+case class RedirectEntry(from: String, to: String, status: Int) {
+  val asString = s"$from $to $status"
+}
+
 object NetlifyClient extends NetlifyClient
 
 class NetlifyClient {
@@ -36,6 +40,9 @@ class NetlifyClient {
 
   def writeHeaders(dir: Path): Path =
     writeHeadersFile(cached(dir), dir.resolve("_headers"))
+
+  def writeRedirects(rs: Seq[RedirectEntry], dir: Path) =
+    writeLines(rs.map(_.asString), dir.resolve("_redirects"))
 
   def cached(dir: Path): Seq[WebsiteFile] = {
     Files.walk(dir).iterator().asScala.toList.map { p =>
@@ -57,9 +64,9 @@ class NetlifyClient {
         )
       )
     }
-    FileIO.write(
-      netlifyHeaders.map(_.asString).mkString.getBytes(StandardCharsets.UTF_8),
-      to
-    )
+    writeLines(netlifyHeaders.map(_.asString), to)
   }
+
+  def writeLines(lines: Seq[String], to: Path) =
+    FileIO.write(lines.mkString.getBytes(StandardCharsets.UTF_8), to)
 }

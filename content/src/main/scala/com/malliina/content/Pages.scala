@@ -1,6 +1,8 @@
 package com.malliina.content
 
 import java.nio.file.{Files, Paths}
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 import scalatags.Text.all._
 
@@ -9,21 +11,44 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
 object Pages extends Pages
 
 class Pages {
-  def index(content: Html): TagPage = TagPage(
+  val listFile = "list.html"
+  val time = tag("time")
+  val titleTag = tag("title")
+  val datetime = attr("datetime")
+
+  def page(title: String, content: Html): TagPage =
+    index(title)(div(`class` := "content")(content), footer(a(href := listFile)("Archive")))
+
+  def list(title: String, pages: Seq[MarkdownPage]) = index(title)(
+    div(`class` := "content")(
+      h1("Posts"),
+      ul(
+        pages.map { page =>
+          li(`class` := "post-item")(a(href := page.noExt)(page.title), format(page.date))
+        }
+      )
+    )
+  )
+
+  def index(titleText: String)(content: Modifier*): TagPage = TagPage(
     html(
       head(
+        titleTag(titleText),
         styleAt("styles-fonts.css"),
         styleAt("styles-main.css"),
         scriptAt("highlight.scala.js"),
         scriptAt("main.js")
       ),
       body(
-        div(`class` := "content")(
-          content
-        )
+        content: _*
       )
     )
   )
+
+  def format(date: LocalDate) = {
+    val localDate = DateTimeFormatter.ISO_LOCAL_DATE.format(date)
+    time(datetime := localDate)(localDate)
+  }
 
   def styleAt(file: String) =
     link(rel := "stylesheet", href := findAsset(s"css/$file"))

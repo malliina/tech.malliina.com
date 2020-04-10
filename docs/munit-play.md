@@ -1,9 +1,11 @@
+---
+title: MUnit with Play Framework
+date: 2020-04-10
+---
 # MUnit with Play Framework
 
 [MUnit](https://scalameta.org/munit/) is a new Scala testing library. This post shows how to test
 [Play Framework](https://www.playframework.com/) apps using MUnit.
-
-
 
 ## The Play app
 
