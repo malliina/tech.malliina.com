@@ -1,5 +1,7 @@
 /*
 Monokai style - ported by Luigi Maselli - http://grigio.org
+
+Modified by myself.
 */
 
 .hljs {
@@ -34,7 +36,6 @@ Monokai style - ported by Luigi Maselli - http://grigio.org
   color: #bf79db;
 }
 
-.hljs-string,
 .hljs-bullet,
 .hljs-subst,
 .hljs-title,
@@ -50,6 +51,10 @@ Monokai style - ported by Luigi Maselli - http://grigio.org
 .hljs-template-tag,
 .hljs-template-variable {
   color: #a6e22e;
+}
+
+.hljs-string {
+  color: #e6db74;
 }
 
 .hljs-comment,
