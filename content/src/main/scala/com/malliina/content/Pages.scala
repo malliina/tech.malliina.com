@@ -8,23 +8,27 @@ import scalatags.Text.all._
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
-object Pages extends Pages
+object Pages {
+  def apply(local: Boolean): Pages = new Pages(local)
+}
 
-class Pages {
+class Pages(local: Boolean) {
   val listFile = "list.html"
+  val listUri = if (local) "list.html" else "list"
   val time = tag("time")
   val titleTag = tag("title")
   val datetime = attr("datetime")
 
   def page(title: String, content: Html): TagPage =
-    index(title)(div(`class` := "content")(content), footer(a(href := listFile)("Archive")))
+    index(title)(div(`class` := "content")(content), footer(a(href := listUri)("Archive")))
 
   def list(title: String, pages: Seq[MarkdownPage]) = index(title)(
     div(`class` := "content")(
       h1("Posts"),
       ul(
         pages.map { page =>
-          li(`class` := "post-item")(a(href := page.noExt)(page.title), format(page.date))
+          val itemUri = if (local) page.name else page.noExt
+          li(`class` := "post-item")(a(href := itemUri)(page.title), format(page.date))
         }
       )
     )

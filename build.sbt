@@ -1,3 +1,5 @@
+import java.nio.file.Path
+
 import play.sbt.PlayImport
 
 val scala212 = "2.12.10"
@@ -5,10 +7,17 @@ val scala213 = "2.13.1"
 
 val npm = taskKey[NPM]("NPM interface")
 val npmBuild = taskKey[Unit]("npm run build")
+val npmKillNode = taskKey[Unit]("Kills node with force")
 val frontendDirectory = settingKey[File]("frontend base dir")
 frontendDirectory in ThisBuild := baseDirectory.value / "frontend"
 val cleanSite = taskKey[Unit]("Empties the target site dir")
 val cleanDocs = taskKey[Unit]("Empties the target docs dir")
+val siteDir = settingKey[File]("Site target dir")
+val docsDir = settingKey[File]("Docs target dir")
+val prepDirs = taskKey[Unit]("Creates directories")
+val writeManifest = inputKey[Path]("Writes the manifest file")
+val build = taskKey[Unit]("Builds the site")
+val deploy = taskKey[Unit]("Deploys the site")
 
 val code = project
   .in(file("code"))
@@ -56,7 +65,6 @@ val content = project
     ),
     npmBuild := npm.value.build(),
     watchSources := watchSources.value ++ Seq(
-//      WatchSource((frontendDirectory in ThisBuild).value),
       WatchSource(
         (frontendDirectory in ThisBuild).value / "src",
         "*.ts" || "*.scss",
@@ -64,12 +72,44 @@ val content = project
       ),
       WatchSource((mdocIn in docs).value)
     ),
-    cleanSite := FileIO.deleteDirectory((baseDirectory in ThisBuild).value / "target" / "site"),
-    cleanDocs := FileIO.deleteDirectory((baseDirectory in ThisBuild).value / "target" / "docs"),
-    run := (run in Compile)
-      .dependsOn((mdoc in docs).toTask(""), npmBuild)
-      .dependsOn(cleanSite, cleanDocs)
-      .evaluated
+    siteDir := (baseDirectory in ThisBuild).value / "target" / "site",
+    cleanSite := FileIO.deleteDirectory(siteDir.value),
+    docsDir := (baseDirectory in ThisBuild).value / "target" / "docs",
+    cleanDocs := FileIO.deleteDirectory(docsDir.value),
+    prepDirs := {
+      // Ownership problems if webpack generates these, apparently
+      val assetsDir = siteDir.value / "assets"
+      Seq(assetsDir / "css", assetsDir / "fonts").map(_.mkdirs())
+    },
+    npmKillNode := npm.value.stop(),
+    writeManifest := {
+      import complete.DefaultParsers._
+      val args: Seq[String] = spaceDelimited("<arg>").parsed
+      FileIO.writeJson(
+        SiteManifest(siteDir.value.toPath, docsDir.value.toPath, local = args.contains("dev")),
+        (target.value / "manifest.json").toPath
+      )
+    },
+    run := Def.taskDyn {
+      (run in Compile)
+        .dependsOn((mdoc in docs).toTask(""), npmBuild)
+        .dependsOn(prepDirs)
+        .toTask(s" ${writeManifest.toTask(" dev").value}")
+    }.value,
+    build := Def.taskDyn {
+      (run in Compile)
+        .dependsOn((mdoc in docs).toTask(""), npmBuild)
+        .dependsOn(prepDirs)
+        .dependsOn(cleanSite, cleanDocs)
+        .toTask(s" ${writeManifest.toTask(" prod").value}")
+    }.value,
+    deploy := NPM
+      .runProcessSync(
+        "netlify deploy --prod",
+        (baseDirectory in ThisBuild).value,
+        streams.value.log
+      ),
+    deploy := deploy.dependsOn(build).value
   )
 
 val blog = project.in(file(".")).aggregate(code, docs, content)

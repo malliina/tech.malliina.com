@@ -59,11 +59,11 @@ class NPM(base: File, target: File, log: Logger) {
     runProcessSync(buildCommand, base, log)
   }
 
-  def watch(): Unit = {
-    val cmd = NPM.canonical(watchCommand)
-    log.info(s"Watching with '$cmd'...")
-    watchProcess = Some(Process(cmd, base).run(log))
-  }
+//  def watch(): Unit = {
+//    val cmd = NPM.canonical(watchCommand)
+//    log.info(s"Watching with '$cmd'...")
+//    watchProcess = Some(Process(cmd, base).run(log))
+//  }
 
   def stop(): Unit = {
     watchProcess.foreach(_.destroy())

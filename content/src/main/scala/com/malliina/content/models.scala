@@ -3,7 +3,7 @@ package com.malliina.content
 import java.nio.file.{Files, Path}
 import java.time.LocalDate
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.ConfigFactory
 import scalatags.Text.all._
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
@@ -46,8 +46,8 @@ object MarkdownPost {
 }
 
 case class MarkdownPage(file: Path, title: String, date: LocalDate) {
-  private val relative = file.getFileName.toString
-  val dotIdx = relative.lastIndexOf(".")
-  val noExt = if (dotIdx == -1) relative else relative.substring(0, dotIdx)
+  val name = file.getFileName.toString
+  val dotIdx = name.lastIndexOf(".")
+  val noExt = if (dotIdx == -1) name else name.substring(0, dotIdx)
   val uri = s"/$noExt"
 }
