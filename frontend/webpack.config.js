@@ -2,12 +2,13 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const isDevelopment = false
 const path = require('path');
 const rootDir = path.resolve(__dirname);
-const cssDir = path.resolve(rootDir, 'src');
+const srcDir = path.resolve(rootDir, 'src');
 
 module.exports = {
   entry: {
-    main: [path.resolve(cssDir, './index.ts')],
-    fonts: [path.resolve(cssDir, './fonts.ts')],
+    lib: [path.resolve(srcDir, './highlight.scala.js')],
+    main: [path.resolve(srcDir, './index.ts')],
+    fonts: [path.resolve(srcDir, './fonts.ts')],
   },
   output: {
     filename: '[name]-[contenthash].js',
@@ -32,6 +33,18 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "[name]-[hash].[ext]"
+            }
+          }
+        ]
+      },
+      {
         test: /\.ts(x?)$/,
         exclude: /node_modules/,
         use: [
@@ -41,10 +54,17 @@ module.exports = {
         ]
       },
       // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+      // {
+      //   enforce: "pre",
+      //   test: /\.js$/,
+      //   loader: "source-map-loader"
+      // },
       {
-        enforce: "pre",
-        test: /\.js$/,
-        loader: "source-map-loader"
+        test: /\.css$/,
+        loader: [
+          isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader,
+          'css-loader'
+        ]
       },
       {
         test: /\.s(a|c)ss$/,

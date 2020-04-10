@@ -52,6 +52,7 @@ val content = project
     ),
     npmBuild := npm.value.build(),
     watchSources := watchSources.value ++ Seq(
+//      WatchSource((frontendDirectory in ThisBuild).value),
       WatchSource(
         (frontendDirectory in ThisBuild).value / "src",
         "*.ts" || "*.scss",

@@ -14,9 +14,8 @@ class Pages {
       head(
         styleAt("styles-fonts.css"),
         styleAt("styles-main.css"),
-        scriptAt("main.js"),
-        scriptAt("highlight.pack.js"),
-        script("hljs.initHighlightingOnLoad();")
+        scriptAt("highlight.scala.js"),
+        scriptAt("main.js")
       ),
       body(
         div(`class` := "content")(
@@ -26,7 +25,8 @@ class Pages {
     )
   )
 
-  def styleAt(file: String) = link(rel := "stylesheet", href := findAsset(s"css/$file"))
+  def styleAt(file: String) =
+    link(rel := "stylesheet", href := findAsset(s"css/$file"))
 
   def scriptAt(file: String) = script(src := findAsset(file))
 
@@ -47,7 +47,9 @@ class Pages {
     }.sortBy { p =>
       Files.getLastModifiedTime(p)
     }.reverse.headOption
-    val found = result.getOrElse(fail(s"Not found: '$file'. Found ${candidates.mkString(", ")}."))
+    val found = result.getOrElse(
+      fail(s"Not found: '$file'. Found ${candidates.mkString(", ")}.")
+    )
     root.relativize(found).toString.replace("\\", "/")
   }
 

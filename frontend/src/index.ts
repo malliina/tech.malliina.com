@@ -1,4 +1,5 @@
 import "./main.scss"
 import "./monokai.scss"
 
-// hljs.initHighlightingOnLoad();
+const hljs: any = (window as any).hljs;
+hljs.initHighlightingOnLoad();
