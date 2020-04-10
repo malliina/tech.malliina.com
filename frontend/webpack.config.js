@@ -6,13 +6,13 @@ const srcDir = path.resolve(rootDir, 'src');
 
 module.exports = {
   entry: {
-    lib: [path.resolve(srcDir, './highlight.scala.js')],
+    // lib: [path.resolve(srcDir, './highlight.scala.js')],
     main: [path.resolve(srcDir, './index.ts')],
     fonts: [path.resolve(srcDir, './fonts.ts')],
   },
   output: {
     filename: '[name]-[contenthash].js',
-    path: path.resolve(rootDir, '../dist/assets')
+    path: path.resolve(rootDir, '../target/site/assets')
   },
   mode: "production",
   // Enable sourcemaps for debugging webpack's output.

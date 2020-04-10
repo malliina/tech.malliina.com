@@ -1,11 +1,31 @@
 package com.malliina.content
 
-import java.io.{FileInputStream, FileOutputStream, InputStream, OutputStream}
-import java.nio.file.{Files, Path, StandardCopyOption}
+import java.io.{FileInputStream, FileOutputStream, IOException, InputStream, OutputStream}
+import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.{
+  FileVisitResult,
+  Files,
+  Path,
+  SimpleFileVisitor,
+  StandardCopyOption,
+  StandardOpenOption
+}
 import java.util.zip.GZIPOutputStream
 
 object FileIO {
   val log = AppLogger(getClass)
+
+  def write(bytes: Array[Byte], to: Path): Path = {
+    if (!Files.isRegularFile(to)) {
+      val dir = to.getParent
+      if (!Files.isDirectory(dir))
+        Files.createDirectories(dir)
+      Files.createFile(to)
+    }
+    Files.write(to, bytes, StandardOpenOption.TRUNCATE_EXISTING)
+    log.info(s"Wrote ${to.toAbsolutePath}.")
+    to
+  }
 
   def copy(from: Path, to: Path): Unit = {
     val dir = to.getParent
@@ -38,6 +58,28 @@ object FileIO {
     }
 
     read()
+  }
+
+  // https://stackoverflow.com/a/27917071
+  def deleteDirectory(dir: Path): Path = {
+    if (Files.exists(dir)) {
+      Files.walkFileTree(
+        dir,
+        new SimpleFileVisitor[Path] {
+          override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
+            Files.delete(file)
+            FileVisitResult.CONTINUE
+          }
+
+          override def postVisitDirectory(dir: Path, exc: IOException): FileVisitResult = {
+            Files.delete(dir)
+            FileVisitResult.CONTINUE
+          }
+        }
+      )
+    } else {
+      dir
+    }
   }
 
   def using[T <: AutoCloseable, U](res: T)(code: T => U): U =

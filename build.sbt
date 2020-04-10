@@ -7,6 +7,7 @@ val npm = taskKey[NPM]("NPM interface")
 val npmBuild = taskKey[Unit]("npm run build")
 val frontendDirectory = settingKey[File]("frontend base dir")
 frontendDirectory in ThisBuild := baseDirectory.value / "frontend"
+val cleanSite = taskKey[Unit]("Deletes the site dir")
 
 val code = project
   .in(file("code"))
@@ -39,6 +40,7 @@ val content = project
     crossScalaVersions := scala213 :: scala212 :: Nil,
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
+      "com.malliina" %% "primitives" % "1.13.0",
       "com.lihaoyi" %% "scalatags" % "0.8.5",
       "com.vladsch.flexmark" % "flexmark" % "0.40.34", // mdoc uses 0.40.34,
       "org.slf4j" % "slf4j-api" % "1.7.25",
@@ -60,7 +62,9 @@ val content = project
       ),
       WatchSource((mdocIn in docs).value)
     ),
+    cleanSite := FileIO.deleteDirectory((baseDirectory in ThisBuild).value / "target" / "site"),
     run := (run in Compile)
+    //      .dependsOn((mdoc in docs).toTask(""), npmBuild.dependsOn(cleanSite))
       .dependsOn((mdoc in docs).toTask(""), npmBuild)
       .evaluated
   )

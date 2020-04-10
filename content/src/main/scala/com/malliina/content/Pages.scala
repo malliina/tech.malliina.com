@@ -31,7 +31,7 @@ class Pages {
   def scriptAt(file: String) = script(src := findAsset(file))
 
   def findAsset(file: String): String = {
-    val root = Paths.get("dist")
+    val root = Paths.get("target").resolve("site")
     val path = root.resolve("assets").resolve(file)
     val dir = path.getParent
     val candidates = Files.list(dir).iterator().asScala.toList
