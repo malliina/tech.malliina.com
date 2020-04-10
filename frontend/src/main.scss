@@ -62,8 +62,12 @@ footer {
 
 .language-scala {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 16px;
+  font-size: 12px;
   line-height: 1.3;
+
+  @media (min-width: 660px) {
+    font-size: 16px;
+  }
 }
 
 .post-item {

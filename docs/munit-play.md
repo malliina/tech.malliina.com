@@ -15,6 +15,7 @@ Suppose we have the following app:
 
 ```scala mdoc:invisible
 import akka.actor.ActorSystem
+import java.io.File
 import munit.FunSuite
 import play.api.ApplicationLoader.Context
 import play.api._
@@ -40,7 +41,7 @@ object PingApp {
   def createTestAppContext: Context = {
     val classLoader = ApplicationLoader.getClass.getClassLoader
     val env =
-      new Environment(new java.io.File("."), classLoader, Mode.Test)
+      new Environment(new File("."), classLoader, Mode.Test)
     Context.create(env)
   }
 }
