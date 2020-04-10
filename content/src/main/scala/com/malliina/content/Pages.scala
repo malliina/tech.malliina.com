@@ -34,17 +34,22 @@ class Pages(local: Boolean) {
     )
   )
 
-  def index(titleText: String)(content: Modifier*): TagPage = TagPage(
+  def index(titleText: String)(contents: Modifier*): TagPage = TagPage(
     html(
       head(
         titleTag(titleText),
+        meta(charset := "UTF-8"),
+        meta(
+          name := "viewport",
+          content := "width=device-width, initial-scale=1.0, maximum-scale=1.0"
+        ),
         styleAt("styles-fonts.css"),
         styleAt("styles-main.css"),
         scriptAt("highlight.scala.js"),
         scriptAt("main.js")
       ),
       body(
-        content: _*
+        contents: _*
       )
     )
   )
