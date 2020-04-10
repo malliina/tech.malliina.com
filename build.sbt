@@ -1,4 +1,5 @@
 import java.nio.file.Path
+import complete.DefaultParsers.spaceDelimited
 
 import play.sbt.PlayImport
 
@@ -17,7 +18,9 @@ val docsDir = settingKey[File]("Docs target dir")
 val prepDirs = taskKey[Unit]("Creates directories")
 val writeManifest = inputKey[Path]("Writes the manifest file")
 val build = taskKey[Unit]("Builds the site")
-val deploy = taskKey[Unit]("Deploys the site")
+val deploy = inputKey[Unit]("Deploys the site")
+val deployDraft = taskKey[Unit]("Deploys the draft site")
+val deployProd = taskKey[Unit]("Deploys the prod site")
 
 val code = project
   .in(file("code"))
@@ -83,7 +86,6 @@ val content = project
     },
     npmKillNode := npm.value.stop(),
     writeManifest := {
-      import complete.DefaultParsers._
       val args: Seq[String] = spaceDelimited("<arg>").parsed
       FileIO.writeJson(
         SiteManifest(siteDir.value.toPath, docsDir.value.toPath, local = args.contains("dev")),
@@ -103,13 +105,18 @@ val content = project
         .dependsOn(cleanSite, cleanDocs)
         .toTask(s" ${writeManifest.toTask(" prod").value}")
     }.value,
-    deploy := NPM
-      .runProcessSync(
-        "netlify deploy --prod",
-        (baseDirectory in ThisBuild).value,
-        streams.value.log
-      ),
-    deploy := deploy.dependsOn(build).value
+    deploy := {
+      val args = spaceDelimited("<arg>").parsed
+      NPM
+        .runProcessSync(
+          args.mkString(" "),
+          (baseDirectory in ThisBuild).value,
+          streams.value.log
+        )
+    },
+    deploy := deploy.dependsOn(build).evaluated,
+    deployProd := deploy.toTask(" netlify deploy --prod").value,
+    deployDraft := deploy.toTask(" netlify deploy").value
   )
 
 val blog = project.in(file(".")).aggregate(code, docs, content)
