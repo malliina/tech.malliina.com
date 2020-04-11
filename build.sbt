@@ -119,6 +119,11 @@ val content = project
     deployDraft := deploy.toTask(" netlify deploy").value
   )
 
-val blog = project.in(file(".")).aggregate(code, docs, content)
+val blog = project
+  .in(file("."))
+  .aggregate(code, docs, content)
+  .settings(
+    deployProd := deployProd.in(content).value
+  )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges

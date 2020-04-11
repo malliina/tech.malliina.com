@@ -21,6 +21,4 @@ To run locally:
 
 To deploy to Netlify:
 
-    sbt
-    project content
-    deploy
+    sbt deployProd
