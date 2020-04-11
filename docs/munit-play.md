@@ -56,7 +56,7 @@ Define the following fixture:
 
 ```scala mdoc:silent
 trait PlayAppFixture { self: FunSuite =>
-  val app = new FunFixture[PingApp](
+  val app = FunFixture[PingApp](
     opts => {
       val comps = new PingApp()
       Play.start(comps.application)
@@ -89,7 +89,7 @@ To run one server per test, define the following fixture:
 
 ```scala mdoc:silent
 trait PlayServerFixture { self: FunSuite =>
-  val server = new FunFixture[RunningServer](
+  val server = FunFixture[RunningServer](
     opts => {
       val comps = new PingApp()
       DefaultTestServerFactory.start(comps.application)

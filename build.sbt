@@ -29,7 +29,7 @@ val code = project
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
       PlayImport.ws,
-      "org.scalameta" %% "munit" % "0.7.1" % Test
+      "org.scalameta" %% "munit" % "0.7.2" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )

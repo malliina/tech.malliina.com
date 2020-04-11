@@ -30,7 +30,7 @@ object PingApp {
 }
 
 trait PlayAppFixture { self: FunSuite =>
-  val app = new FunFixture[PingApp](
+  val app = FunFixture[PingApp](
     opts => {
       val comps = new PingApp()
       Play.start(comps.application)
@@ -43,7 +43,7 @@ trait PlayAppFixture { self: FunSuite =>
 }
 
 trait PlayServerFixture { self: FunSuite =>
-  val server = new FunFixture[RunningServer](
+  val server = FunFixture[RunningServer](
     opts => {
       val comps = new PingApp()
       DefaultTestServerFactory.start(comps.application)
