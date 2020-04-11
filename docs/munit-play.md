@@ -9,14 +9,12 @@ date: 2020-04-10
 
 ## The Play app
 
-Let's use Play's
-[compile time dependency injection](https://www.playframework.com/documentation/2.8.x/ScalaCompileTimeDependencyInjection).
-Suppose we have the following app:
+Suppose we have the following app, which uses Play's [compile time dependency injection](https://www.playframework.com/documentation/2.8.x/ScalaCompileTimeDependencyInjection):
 
 ```scala mdoc:invisible
-import akka.actor.ActorSystem
 import java.io.File
-import munit.FunSuite
+import akka.actor.ActorSystem
+import munit.{FunSuite, Suite}
 import play.api.ApplicationLoader.Context
 import play.api._
 import play.api.libs.ws.ahc.AhcWSClient
@@ -48,7 +46,8 @@ object PingApp {
 ```
 
 We create a MUnit [fixture](https://scalameta.org/munit/docs/fixtures.html) that runs one such app per 
-test. Then we create another fixture that runs one server per test.
+test. Then we create another fixture that runs one server per test. Finally, we create fixtures where all tests
+in the suite share the same app or server.
 
 ### One App per Test
 
@@ -116,4 +115,91 @@ class TestServer extends FunSuite with PlayServerFixture {
 }
 ```
 
-This is similar to OneServerPerTest in scalatestplus-play. Enjoy!
+This is similar to OneServerPerTest in scalatestplus-play. 
+
+### One App per Suite
+
+To use the same app in all tests in the suite, define this fixture:
+
+```scala mdoc:silent
+trait AppPerSuite { self: Suite =>
+  val pingApp = new Fixture[PingApp]("ping-app") {
+    private var comps: PingApp = null
+    def apply() = comps
+    override def beforeAll(): Unit = {
+      comps = new PingApp()
+      Play.start(comps.application)
+    }
+    override def afterAll(): Unit = {
+      Play.stop(comps.application)
+    }
+  }
+
+  override def munitFixtures = Seq(pingApp)
+}
+```
+
+Use it as follows:
+
+```scala mdoc:compile-only
+class AppTests extends FunSuite with AppPerSuite {
+  test("request to ping address returns 200") {
+    val app = pingApp().application
+    val req = FakeRequest("GET", "/ping")
+    val res = await(route(app, req).get)
+    assert(res.header.status == 200)
+  }
+
+  test("request to wrong address returns 404") {
+    val app = pingApp().application
+    val req = FakeRequest("GET", "/nonexistent")
+    val res = await(route(app, req).get)
+    assert(res.header.status == 404)
+  }
+}
+```
+
+### One Server per Suite
+
+To use the same server in all tests in the suite, define this fixture:
+
+```scala mdoc:silent
+trait ServerPerSuite { self: Suite =>
+  val server = new Fixture[RunningServer]("ping-server") {
+    private var runningServer: RunningServer = null
+    def apply() = runningServer
+    override def beforeAll(): Unit = {
+      val app = new PingApp()
+      runningServer = DefaultTestServerFactory.start(app.application)
+    }
+    override def afterAll(): Unit = {
+      runningServer.stopServer.close()
+    }
+  }
+
+  override def munitFixtures = Seq(server)
+}
+```
+
+Then mix in that trait when writing your tests:
+
+```scala mdoc:compile-only
+class ServerTests extends FunSuite with ServerPerSuite {
+  implicit val as = ActorSystem("test")
+  val http = AhcWSClient()
+
+  test("request to ping address returns 200") {
+    val port = server().endpoints.httpEndpoint.map(_.port).get
+    val res = await(http.url(s"http://localhost:$port/ping").get())
+    assert(res.status == 200)
+  }
+
+  test("request to wrong address returns 404") {
+    val port = server().endpoints.httpEndpoint.map(_.port).get
+    val res = await(http.url(s"http://localhost:$port/nonexistent").get())
+    assert(res.status == 404)
+  }
+}
+```
+
+Enjoy!
