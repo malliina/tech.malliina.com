@@ -14,7 +14,8 @@ object Pages {
 
 class Pages(local: Boolean) {
   val listFile = "list.html"
-  val listUri = if (local) "list.html" else "list"
+  val remoteListUri = "list"
+  val listUri = if (local) "list.html" else remoteListUri
   val time = tag("time")
   val titleTag = tag("title")
   val datetime = attr("datetime")

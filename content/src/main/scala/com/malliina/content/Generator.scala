@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 
 import com.malliina.content.netlify.{NetlifyClient, RedirectEntry}
+import com.malliina.http.FullUrl
 import play.api.libs.json.Json
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
@@ -35,6 +36,7 @@ object Generator {
         .asScala
         .filter(_.getFileName.toString.endsWith(ext))
         .toList
+    // Only includes markdown files with metadata
     val markdownPages = mds.flatMap { markdownFile =>
       val post = MarkdownPost(markdownFile)
       val html = MarkdownConverter.toHtml(post.content)
@@ -47,6 +49,9 @@ object Generator {
     }
     val newestFirst = markdownPages.sortBy(_.date.toEpochDay).reverse
     pages.list("Archive", newestFirst).write(distDir.resolve(pages.listFile))
+    val uris = newestFirst.map(_.uri) :+ s"/${pages.remoteListUri}"
+    val domain = FullUrl.https("tech.malliina.com", "")
+    SEO.write(uris.map(uri => domain.withUri(uri)), domain, distDir)
     newestFirst.headOption.foreach { newest =>
       NetlifyClient.writeRedirects(Seq(RedirectEntry("/*", newest.uri, 302)), distDir)
     }

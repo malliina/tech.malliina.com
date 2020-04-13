@@ -1,6 +1,7 @@
 package com.malliina.content
 
 import java.io.{FileInputStream, FileOutputStream, IOException, InputStream, OutputStream}
+import java.nio.charset.StandardCharsets
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.{
   FileVisitResult,
@@ -14,6 +15,9 @@ import java.util.zip.GZIPOutputStream
 
 object FileIO {
   val log = AppLogger(getClass)
+
+  def writeLines(lines: Seq[String], to: Path): Path =
+    write(lines.mkString("\n").getBytes(StandardCharsets.UTF_8), to)
 
   def write(bytes: Array[Byte], to: Path): Path = {
     if (!Files.isRegularFile(to)) {
