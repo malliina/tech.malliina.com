@@ -45,6 +45,7 @@ class Pages(local: Boolean) {
           content := "width=device-width, initial-scale=1.0, maximum-scale=1.0"
         ),
         meta(name := "description", content := "Posts on Scala, programming, and other tech topics."),
+        meta(name := "keywords", content := "Scala, sbt, code, programming, tech, frontend, backend"),
         styleAt("styles-fonts.css"),
         styleAt("styles-main.css"),
         scriptAt("highlight.scala.js"),
