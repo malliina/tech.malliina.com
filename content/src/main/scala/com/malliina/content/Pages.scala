@@ -4,21 +4,27 @@ import java.nio.file.{Files, Paths}
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+import com.malliina.content.Pages._
 import scalatags.Text.all._
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
 object Pages {
   def apply(local: Boolean): Pages = new Pages(local)
+
+  val time = tag("time")
+  val titleTag = tag("title")
+
+  val datetime = attr("datetime")
+  val property = attr("property")
 }
 
 class Pages(local: Boolean) {
   val listFile = "list.html"
   val remoteListUri = "list"
   val listUri = if (local) "list.html" else remoteListUri
-  val time = tag("time")
-  val titleTag = tag("title")
-  val datetime = attr("datetime")
+
+  val globalDescription = "Posts on Scala, programming, and other tech topics."
 
   def page(title: String, content: Html): TagPage =
     index(title)(div(`class` := "content")(content), footer(a(href := listUri)("Archive")))
@@ -36,7 +42,7 @@ class Pages(local: Boolean) {
   )
 
   def index(titleText: String)(contents: Modifier*): TagPage = TagPage(
-    html(
+    html(lang := "en")(
       head(
         titleTag(titleText),
         meta(charset := "UTF-8"),
@@ -44,8 +50,13 @@ class Pages(local: Boolean) {
           name := "viewport",
           content := "width=device-width, initial-scale=1.0, maximum-scale=1.0"
         ),
-        meta(name := "description", content := "Posts on Scala, programming, and other tech topics."),
+        meta(name := "description", content := globalDescription),
         meta(name := "keywords", content := "Scala, sbt, code, programming, tech, frontend, backend"),
+        meta(name := "twitter:card", content := "summary"),
+        meta(name := "twitter:site", content := "@kungmalle"),
+        meta(name := "twitter:creator", content := "@kungmalle"),
+        meta(property := "og:title", content := titleText),
+        meta(property := "og:description", content := globalDescription),
         styleAt("styles-fonts.css"),
         styleAt("styles-main.css"),
         scriptAt("highlight.scala.js"),
