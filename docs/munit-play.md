@@ -4,12 +4,12 @@ date: 2020-04-10
 ---
 # MUnit with Play Framework
 
-[MUnit](https://scalameta.org/munit/) is a new Scala testing library. This post shows how to test
-[Play Framework](https://www.playframework.com/) apps using MUnit.
+[MUnit](https://scalameta.org/munit/ "MUnit website") is a new Scala testing library. This post shows how to test
+[Play Framework](https://www.playframework.com/ "Play Framework website") apps using MUnit.
 
 ## The Play app
 
-Suppose we have the following app, which uses Play's [compile time dependency injection](https://www.playframework.com/documentation/2.8.x/ScalaCompileTimeDependencyInjection):
+Suppose we have the following app, which uses Play's [compile time dependency injection](https://www.playframework.com/documentation/2.8.x/ScalaCompileTimeDependencyInjection "Compile time dependency injection"):
 
 ```scala mdoc:invisible
 import java.io.File
@@ -45,7 +45,7 @@ object PingApp {
 }
 ```
 
-We create a MUnit [fixture](https://scalameta.org/munit/docs/fixtures.html) that runs one such app per 
+We create a MUnit [fixture](https://scalameta.org/munit/docs/fixtures.html "MUnit fixtures") that runs one such app per 
 test. Then we create another fixture that runs one server per test. Finally, we create fixtures where all tests
 in the suite share the same app or server.
 
@@ -80,7 +80,7 @@ class TestSuite extends FunSuite with PlayAppFixture {
 }
 ```
 
-This is similar to OneAppPerTest in [scalatestplus-play](https://github.com/playframework/scalatestplus-play).
+This is similar to OneAppPerTest in [scalatestplus-play](https://github.com/playframework/scalatestplus-play "scalatestplus-play").
 
 ### One Server per Test
 

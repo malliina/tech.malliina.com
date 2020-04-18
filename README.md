@@ -19,6 +19,8 @@ To run locally:
     project content
     ~run
 
+Open an HTML file in `target/site`.
+
 To deploy to Netlify:
 
     sbt deployProd
