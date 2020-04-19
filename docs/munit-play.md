@@ -134,6 +134,7 @@ trait AppPerSuite { self: Suite =>
       Play.stop(comps.application)
     }
   }
+  def app = pingApp().application
 
   override def munitFixtures = Seq(pingApp)
 }
@@ -144,14 +145,12 @@ Use it as follows:
 ```scala mdoc:compile-only
 class AppTests extends FunSuite with AppPerSuite {
   test("request to ping address returns 200") {
-    val app = pingApp().application
     val req = FakeRequest("GET", "/ping")
     val res = await(route(app, req).get)
     assert(res.header.status == 200)
   }
 
   test("request to wrong address returns 404") {
-    val app = pingApp().application
     val req = FakeRequest("GET", "/nonexistent")
     val res = await(route(app, req).get)
     assert(res.header.status == 404)
@@ -176,6 +175,7 @@ trait ServerPerSuite { self: Suite =>
       runningServer.stopServer.close()
     }
   }
+  def port = server().endpoints.httpEndpoint.map(_.port).get
 
   override def munitFixtures = Seq(server)
 }
@@ -189,13 +189,11 @@ class ServerTests extends FunSuite with ServerPerSuite {
   val http = AhcWSClient()
 
   test("request to ping address returns 200") {
-    val port = server().endpoints.httpEndpoint.map(_.port).get
     val res = await(http.url(s"http://localhost:$port/ping").get())
     assert(res.status == 200)
   }
 
   test("request to wrong address returns 404") {
-    val port = server().endpoints.httpEndpoint.map(_.port).get
     val res = await(http.url(s"http://localhost:$port/nonexistent").get())
     assert(res.status == 404)
   }
