@@ -200,5 +200,5 @@ class ServerTests extends FunSuite with ServerPerSuite {
 }
 ```
 
-Complete code samples are in [GitHub](https://github.com/malliina/blog/blob/master/code/test/com/malliina/code/MUnitPlay.scala). 
+Complete code samples are available in [GitHub](https://github.com/malliina/blog/blob/master/code/test/com/malliina/code/MUnitPlay.scala). 
 Enjoy!
