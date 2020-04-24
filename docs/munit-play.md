@@ -49,7 +49,7 @@ We create a MUnit [fixture](https://scalameta.org/munit/docs/fixtures.html "MUni
 test. Then we create another fixture that runs one server per test. Finally, we create fixtures where all tests
 in the suite share the same app or server.
 
-### One App per Test
+### One app per test
 
 Define the following fixture:
 
@@ -82,7 +82,7 @@ class TestSuite extends FunSuite with PlayAppFixture {
 
 This is similar to OneAppPerTest in [scalatestplus-play](https://github.com/playframework/scalatestplus-play "scalatestplus-play").
 
-### One Server per Test
+### One server per test
 
 To run one server per test, define the following fixture:
 
@@ -117,7 +117,7 @@ class TestServer extends FunSuite with PlayServerFixture {
 
 This is similar to OneServerPerTest in scalatestplus-play. 
 
-### One App per Suite
+### One app per suite
 
 To use the same app in all tests in the suite, define this fixture:
 
@@ -158,7 +158,7 @@ class AppTests extends FunSuite with AppPerSuite {
 }
 ```
 
-### One Server per Suite
+### One server per suite
 
 To use the same server in all tests in the suite, define this fixture:
 

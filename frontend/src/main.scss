@@ -19,13 +19,17 @@ h1 {
 }
 
 h2 {
-  margin-top: 26px;
+  margin-top: 52px;
   margin-bottom: 26px;
 }
 
 h3 {
-  margin-top: 20px;
+  margin-top: 40px;
   margin-bottom: 20px;
+}
+
+p {
+  margin: 16px 0;
 }
 
 pre {
@@ -51,16 +55,7 @@ footer {
   }
 }
 
-.content {
-  min-height: 100vh;
-  background: white;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 40px 10px;
-}
-
-.language-scala {
+code {
   font-family: 'JetBrains Mono', monospace;
   font-size: 12px;
   line-height: 1.3;
@@ -68,6 +63,15 @@ footer {
   @media (min-width: 660px) {
     font-size: 16px;
   }
+}
+
+.content {
+  min-height: 100vh;
+  background: white;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 40px 10px;
 }
 
 .post-item {
