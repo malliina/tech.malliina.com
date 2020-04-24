@@ -105,6 +105,18 @@ module.exports = {
         use: [
           {loader: 'url-loader', options: {limit: 262144, name: 'fonts/[name]-[hash].[ext]'}}
         ]
+      },
+      {
+        test: /\.jpg$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: "file-loader",
+            options: {
+              name: "images/[name]-[hash].[ext]"
+            }
+          }
+        ]
       }
     ]
   }

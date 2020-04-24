@@ -5,12 +5,15 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 import com.malliina.content.Pages._
+import com.malliina.http.FullUrl
 import scalatags.Text.all._
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
 object Pages {
   def apply(local: Boolean): Pages = new Pages(local)
+
+  val domain = FullUrl.https("tech.malliina.com", "")
 
   val time = tag("time")
   val titleTag = tag("title")
@@ -51,10 +54,14 @@ class Pages(local: Boolean) {
           content := "width=device-width, initial-scale=1.0, maximum-scale=1.0"
         ),
         meta(name := "description", content := globalDescription),
-        meta(name := "keywords", content := "Scala, sbt, code, programming, tech, frontend, backend"),
+        meta(
+          name := "keywords",
+          content := "Scala, sbt, code, programming, tech, frontend, backend"
+        ),
         meta(name := "twitter:card", content := "summary"),
         meta(name := "twitter:site", content := "@kungmalle"),
         meta(name := "twitter:creator", content := "@kungmalle"),
+        meta(name := "og:image", content := (Pages.domain / findAsset("images/jag.jpg")).url),
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
         styleAt("styles-fonts.css"),
