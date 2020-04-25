@@ -27,6 +27,21 @@ Finally, import your Scala project as a BSP project instead of an sbt project in
 
 Bloop is fast and accurate, and removes the need to have a separate terminal window open for compilation purposes.
 
+## sbt-scalafmt
+
+Use [Scalafmt](https://scalameta.org/scalafmt/) to format your codebase consistently. To install:
+
+```scala ignore
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.4")
+```
+
+I recommend using the *reformat on file save* option in [IntelliJ IDEA](https://www.jetbrains.com/idea/) as described 
+in Scalafmt's [installation instructions](https://scalameta.org/scalafmt/docs/installation.html).
+
+You can also format the entire codebase in one command with:
+
+    sbt scalafmtAll
+
 ## sbt-buildinfo
 
 You often want to use build metadata in your application. For example, your app may display the current 
@@ -42,21 +57,6 @@ addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.9.0")
 The plugin generates a Scala source file with an object that will be compiled with the rest of your code. You then
 access the *BuildInfo* object to read the parameters that you wish to display in your app. Follow the instructions 
 in [https://github.com/sbt/sbt-buildinfo](https://github.com/sbt/sbt-buildinfo) for details.
-
-## sbt-scalafmt
-
-Use [Scalafmt](https://scalameta.org/scalafmt/) to format your codebase consistently. To install:
-
-```scala ignore
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.4")
-```
-
-I recommend using the *reformat on file save* option in [IntelliJ IDEA](https://www.jetbrains.com/idea/) as described 
-in Scalafmt's [installation instructions](https://scalameta.org/scalafmt/docs/installation.html).
-
-You can also format the entire codebase in one command with:
-
-    sbt scalafmtAll
 
 ## sbt-mdoc
 
