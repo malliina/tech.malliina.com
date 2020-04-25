@@ -4,7 +4,7 @@ date: 2020-04-25
 ---
 # Useful sbt plugins
 
-[sbt](https://www.scala-sbt.org/) is a build tool for Scala. This post lists sbt plugins I think are useful in most
+[sbt](https://www.scala-sbt.org/) is a build tool for Scala. This post lists sbt plugins I have found useful in many
 projects.
 
 ## sbt-bloop
@@ -48,7 +48,7 @@ in [https://github.com/sbt/sbt-buildinfo](https://github.com/sbt/sbt-buildinfo) 
 Use [Scalafmt](https://scalameta.org/scalafmt/) to format your codebase consistently. To install:
 
 ```scala ignore
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.0")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.4")
 ```
 
 I recommend using the *reformat on file save* option in [IntelliJ IDEA](https://www.jetbrains.com/idea/) as described 
@@ -57,6 +57,21 @@ in Scalafmt's [installation instructions](https://scalameta.org/scalafmt/docs/in
 You can also format the entire codebase in one command with:
 
     sbt scalafmtAll
+
+## sbt-mdoc
+
+Use [sbt-mdoc](https://scalameta.org/mdoc/) to typecheck your Scala code samples embedded in Markdown documentation. 
+You can also inject build parameters to the documentation. This is useful when you want your documentation to
+always refers to the latest version number, for example in your Markdown-based installation instructions like README.md.
+
+Installation:
+
+```scala ignore
+addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.1.5")
+```
+
+Follow the instructions in [mdoc's installation instructions](https://scalameta.org/mdoc/docs/installation.html) to 
+get started.
 
 ## Build your own plugin
 
