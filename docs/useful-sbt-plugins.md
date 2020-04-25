@@ -61,8 +61,9 @@ You can also format the entire codebase in one command with:
 ## sbt-mdoc
 
 Use [sbt-mdoc](https://scalameta.org/mdoc/) to typecheck your Scala code samples embedded in Markdown documentation. 
-You can also inject build parameters to the documentation. This is useful when you want your documentation to
-always refers to the latest version number, for example in your Markdown-based installation instructions like README.md.
+The plugin can also inject build parameters to the documentation. This is useful when you want your documentation to
+always refer to the latest version number of your software, for example in your Markdown-based installation instructions 
+like README.md.
 
 Installation:
 
