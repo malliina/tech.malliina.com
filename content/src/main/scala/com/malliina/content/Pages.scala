@@ -41,6 +41,10 @@ class Pages(local: Boolean) {
           li(`class` := "post-item")(a(href := itemUri)(page.title), format(page.date))
         }
       )
+    ),
+    footer(
+      a(href := "https://github.com/malliina")("GitHub"),
+      a(href := "https://twitter.com/kungmalle")("Twitter")
     )
   )
 
