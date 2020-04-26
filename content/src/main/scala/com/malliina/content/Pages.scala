@@ -65,11 +65,10 @@ class Pages(local: Boolean) {
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
         styleAt("styles-fonts.css"),
-        styleAt("styles-main.css"),
-        scriptAt("main.js")
+        styleAt("styles-main.css")
       ),
       body(
-        contents: _*
+        contents :+ scriptAt("main.js", defer)
       )
     )
   )
@@ -82,7 +81,7 @@ class Pages(local: Boolean) {
   def styleAt(file: String) =
     link(rel := "stylesheet", href := findAsset(s"css/$file"))
 
-  def scriptAt(file: String) = script(src := findAsset(file))
+  def scriptAt(file: String, modifiers: Modifier*) = script(src := findAsset(file), modifiers)
 
   def findAsset(file: String): String = {
     val root = Paths.get("target").resolve("site")
