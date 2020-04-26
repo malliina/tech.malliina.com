@@ -1,7 +1,8 @@
 import "./main.scss"
 import "./monokai.scss"
-import "./highlight.scala.js"
+import * as scala from "./scala"
+import * as hljs from "./core"
 import "./images/jag.jpg"
 
-const hljs: any = (window as any).hljs;
-hljs.initHighlightingOnLoad();
+hljs.registerLanguage("scala", scala)
+hljs.initHighlightingOnLoad()

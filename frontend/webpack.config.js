@@ -20,7 +20,7 @@ module.exports = {
 
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: [".ts", ".scss"]
+    extensions: [".ts", ".scss", ".js"]
   },
 
   plugins: [
@@ -32,18 +32,6 @@ module.exports = {
 
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: [
-          {
-            loader: "file-loader",
-            options: {
-              name: "[name]-[hash].[ext]"
-            }
-          }
-        ]
-      },
       {
         test: /\.ts(x?)$/,
         exclude: /node_modules/,

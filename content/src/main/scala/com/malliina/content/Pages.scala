@@ -66,7 +66,6 @@ class Pages(local: Boolean) {
         meta(property := "og:description", content := globalDescription),
         styleAt("styles-fonts.css"),
         styleAt("styles-main.css"),
-        scriptAt("highlight.scala.js"),
         scriptAt("main.js")
       ),
       body(
