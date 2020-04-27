@@ -3,6 +3,7 @@ package com.malliina.content
 import java.nio.file.{Files, Path}
 import java.time.LocalDate
 
+import com.malliina.http.FullUrl
 import com.typesafe.config.ConfigFactory
 import scalatags.Text.all._
 
@@ -45,7 +46,7 @@ object MarkdownPost {
   }
 }
 
-case class MarkdownPage(file: Path, title: String, date: LocalDate) {
+case class MarkdownPage(file: Path, title: String, url: FullUrl, date: LocalDate) {
   val name = file.getFileName.toString
   val dotIdx = name.lastIndexOf(".")
   val noExt = if (dotIdx == -1) name else name.substring(0, dotIdx)

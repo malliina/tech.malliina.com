@@ -36,22 +36,23 @@ object Generator {
         .asScala
         .filter(_.getFileName.toString.endsWith(ext))
         .toList
+    val domain = Pages.domain
     // Only includes markdown files with metadata
     val markdownPages = mds.flatMap { markdownFile =>
       val post = MarkdownPost(markdownFile)
       val html = MarkdownConverter.toHtml(post.content)
       val noExt = markdownFile.getFileName.toString.dropRight(ext.length)
       val out = distDir.resolve(s"$noExt.html")
-      val htmlFile = pages.page(post.title, html).write(out)
+      val url = domain / noExt
+      val htmlFile = pages.page(post.title, url, html).write(out)
       post.meta.map { meta =>
-        MarkdownPage(htmlFile, meta.title, meta.date)
+        MarkdownPage(htmlFile, meta.title, url, meta.date)
       }
     }
     val newestFirst = markdownPages.sortBy(_.date.toEpochDay).reverse
-    pages.list("Archive", newestFirst).write(distDir.resolve(pages.listFile))
-    val uris = newestFirst.map(_.uri) :+ s"/${pages.remoteListUri}"
-    val domain = Pages.domain
-    SEO.write(uris.map(uri => domain.withUri(uri)), domain, distDir)
+    val listUrl = domain / pages.remoteListUri
+    pages.list("Archive", listUrl, newestFirst).write(distDir.resolve(pages.listFile))
+    SEO.write(markdownPages.map(_.url) :+ listUrl, domain, distDir)
     newestFirst.headOption.foreach { newest =>
       NetlifyClient.writeRedirects(Seq(RedirectEntry("/*", newest.uri, 302)), distDir)
     }

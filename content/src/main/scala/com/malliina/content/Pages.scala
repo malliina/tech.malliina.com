@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter
 import com.malliina.content.Pages._
 import com.malliina.http.FullUrl
 import scalatags.Text.all._
+import scalatags.text.Builder
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
@@ -14,12 +15,16 @@ object Pages {
   def apply(local: Boolean): Pages = new Pages(local)
 
   val domain = FullUrl.https("tech.malliina.com", "")
+  implicit val fullUrl: AttrValue[FullUrl] = attrType[FullUrl](_.url)
 
   val time = tag("time")
   val titleTag = tag("title")
 
   val datetime = attr("datetime")
   val property = attr("property")
+
+  def attrType[T](stringify: T => String): AttrValue[T] = (t: Builder, a: Attr, v: T) =>
+    t.setAttr(a.name, Builder.GenericAttrValueSource(stringify(v)))
 }
 
 class Pages(local: Boolean) {
@@ -29,10 +34,10 @@ class Pages(local: Boolean) {
 
   val globalDescription = "Posts on Scala, programming, and other tech topics."
 
-  def page(title: String, content: Html): TagPage =
-    index(title)(div(`class` := "content")(content), footer(a(href := listUri)("Archive")))
+  def page(title: String, url: FullUrl, content: Html): TagPage =
+    index(title, url)(div(`class` := "content")(content), footer(a(href := listUri)("Archive")))
 
-  def list(title: String, pages: Seq[MarkdownPage]) = index(title)(
+  def list(title: String, url: FullUrl, pages: Seq[MarkdownPage]) = index(title, url)(
     div(`class` := "content")(
       h1("Posts"),
       ul(
@@ -48,7 +53,7 @@ class Pages(local: Boolean) {
     )
   )
 
-  def index(titleText: String)(contents: Modifier*): TagPage = TagPage(
+  def index(titleText: String, url: FullUrl)(contents: Modifier*): TagPage = TagPage(
     html(lang := "en")(
       head(
         titleTag(titleText),
@@ -65,9 +70,10 @@ class Pages(local: Boolean) {
         meta(name := "twitter:card", content := "summary"),
         meta(name := "twitter:site", content := "@kungmalle"),
         meta(name := "twitter:creator", content := "@kungmalle"),
-        meta(name := "og:image", content := (Pages.domain / findAsset("images/jag.jpg")).url),
+        meta(name := "og:image", content := (Pages.domain / findAsset("images/jag.jpg"))),
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
+        link(rel := "canonical", href := url),
         styleAt("styles-fonts.css"),
         styleAt("styles-main.css")
       ),
