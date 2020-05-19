@@ -13,14 +13,8 @@ A quick feedback loop is essential to productivity. Get quick build feedback dir
 [Bloop](https://scalacenter.github.io/bloop/). To install:
 
 ```scala ignore
-addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "1.4.0-RC1")
+addSbtPlugin("ch.epfl.scala" % "sbt-bloop" % "1.4.1")
 ```
-
-Then run:
-
-```scala ignore
-sbt bloopInstall
-``` 
 
 Finally, import your Scala project as a BSP project instead of an sbt project in 
 [IntelliJ IDEA](https://www.jetbrains.com/idea/). 
@@ -32,7 +26,7 @@ Bloop is fast and accurate, and removes the need to have a separate terminal win
 Use [Scalafmt](https://scalameta.org/scalafmt/) to format your codebase consistently. To install:
 
 ```scala ignore
-addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.3.4")
+addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.0")
 ```
 
 I recommend using the *reformat on file save* option in [IntelliJ IDEA](https://www.jetbrains.com/idea/) as described 
