@@ -56,7 +56,7 @@ val content = project
       "com.malliina" %% "primitives" % "1.15.0",
       "com.lihaoyi" %% "scalatags" % "0.9.0",
       "com.typesafe" % "config" % "1.4.0",
-      "com.vladsch.flexmark" % "flexmark" % "0.40.34", // mdoc uses 0.40.34,
+      "com.vladsch.flexmark" % "flexmark" % "0.62.2", // mdoc uses 0.40.34,
       "org.slf4j" % "slf4j-api" % "1.7.25",
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "ch.qos.logback" % "logback-core" % "1.2.3"

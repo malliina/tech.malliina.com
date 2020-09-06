@@ -5,7 +5,7 @@ import java.nio.file.Path
 import com.malliina.content.Generator.fileToString
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
-import com.vladsch.flexmark.util.options.MutableDataSet
+import com.vladsch.flexmark.util.data.MutableDataSet
 
 object MarkdownConverter extends MarkdownConverter
 
