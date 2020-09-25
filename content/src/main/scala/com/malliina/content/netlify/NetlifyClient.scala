@@ -1,12 +1,11 @@
 package com.malliina.content.netlify
 
-import java.io.IOException
 import java.nio.charset.StandardCharsets
-import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.{FileVisitResult, Files, Path, Paths, SimpleFileVisitor}
+import java.nio.file.{Files, Path, Paths}
+
+import com.malliina.content.{CacheControl, CacheControls, FileIO, IO}
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
-import com.malliina.content.{CacheControl, CacheControls, FileIO, IO}
 
 case class NetlifyHeader(path: String, headers: Map[String, String]) {
   // https://docs.netlify.com/routing/headers/#syntax-for-the-headers-file

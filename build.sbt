@@ -3,8 +3,8 @@ import complete.DefaultParsers.spaceDelimited
 
 import play.sbt.PlayImport
 
-val scala212 = "2.12.11"
-val scala213 = "2.13.2"
+val scala212 = "2.12.12"
+val scala213 = "2.13.3"
 
 val npm = taskKey[NPM]("NPM interface")
 val npmBuild = taskKey[Unit]("npm run build")
@@ -29,7 +29,7 @@ val code = project
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
       PlayImport.ws,
-      "org.scalameta" %% "munit" % "0.7.3" % Test
+      "org.scalameta" %% "munit" % "0.7.12" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
@@ -53,11 +53,11 @@ val content = project
     crossScalaVersions := scala213 :: scala212 :: Nil,
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
-      "com.malliina" %% "primitives" % "1.15.0",
-      "com.lihaoyi" %% "scalatags" % "0.9.0",
+      "com.malliina" %% "primitives" % "1.17.0",
+      "com.lihaoyi" %% "scalatags" % "0.9.1",
       "com.typesafe" % "config" % "1.4.0",
       "com.vladsch.flexmark" % "flexmark" % "0.62.2",
-      "org.slf4j" % "slf4j-api" % "1.7.25",
+      "org.slf4j" % "slf4j-api" % "1.7.30",
       "ch.qos.logback" % "logback-classic" % "1.2.3",
       "ch.qos.logback" % "logback-core" % "1.2.3"
     ),
@@ -123,7 +123,8 @@ val blog = project
   .in(file("."))
   .aggregate(code, docs, content)
   .settings(
-    deployProd := deployProd.in(content).value
+    deployProd := deployProd.in(content).value,
+    run in Compile := run.in(content).evaluated
   )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges

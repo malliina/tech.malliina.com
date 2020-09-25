@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 
 import com.malliina.content.netlify.{NetlifyClient, RedirectEntry}
-import com.malliina.http.FullUrl
 import play.api.libs.json.Json
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
@@ -25,7 +24,7 @@ object Generator {
     run(manifest)
   }
 
-  def run(manifest: SiteManifest) = {
+  def run(manifest: SiteManifest): Path = {
     val pages = Pages(manifest.local)
     val distDir = manifest.distDir
     val ext = ".md"
@@ -53,9 +52,7 @@ object Generator {
     val listUrl = domain / pages.remoteListUri
     pages.list("Archive", listUrl, newestFirst).write(distDir.resolve(pages.listFile))
     SEO.write(markdownPages.map(_.url) :+ listUrl, domain, distDir)
-    newestFirst.headOption.foreach { newest =>
-      NetlifyClient.writeRedirects(Seq(RedirectEntry("/*", newest.uri, 302)), distDir)
-    }
+    NetlifyClient.writeRedirects(Seq(RedirectEntry("/*", pages.listUri, 302)), distDir)
     NetlifyClient.writeHeaders(distDir)
   }
 
