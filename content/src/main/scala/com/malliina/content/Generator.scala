@@ -52,7 +52,7 @@ object Generator {
     val listUrl = domain / pages.remoteListUri
     pages.list("Archive", listUrl, newestFirst).write(distDir.resolve(pages.listFile))
     SEO.write(markdownPages.map(_.url) :+ listUrl, domain, distDir)
-    NetlifyClient.writeRedirects(Seq(RedirectEntry("/*", pages.listUri, 302)), distDir)
+    NetlifyClient.writeRedirects(Seq(RedirectEntry("/*", s"/${pages.listUri}", 302)), distDir)
     NetlifyClient.writeHeaders(distDir)
   }
 
