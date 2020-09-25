@@ -50,7 +50,7 @@ object Generator {
     }
     val newestFirst = markdownPages.sortBy(_.date.toEpochDay).reverse
     val listUrl = domain / pages.remoteListUri
-    pages.list("Archive", listUrl, newestFirst).write(distDir.resolve(pages.listFile))
+    pages.list("Posts", listUrl, newestFirst).write(distDir.resolve(pages.listFile))
     SEO.write(markdownPages.map(_.url) :+ listUrl, domain, distDir)
     NetlifyClient.writeRedirects(Seq(RedirectEntry("/*", s"/${pages.listUri}", 302)), distDir)
     NetlifyClient.writeHeaders(distDir)
