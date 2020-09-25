@@ -21,9 +21,9 @@ To run locally:
 
 Open an HTML file in `target/site`.
 
-To deploy to Netlify:
+## Deployments
 
-    sbt deployProd
+To deploy to [tech.malliina.com](https://tech.malliina.com) hosted at Netlify, push to the `master` branch.
 
 ### Code highlighting
 
