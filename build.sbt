@@ -32,11 +32,11 @@ val code = project
     libraryDependencies ++= http4sModules.map { m =>
       "org.http4s" %% s"http4s-$m" % "0.21.16"
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
-      "org.tpolecat" %% d % "0.9.4"
+      "org.tpolecat" %% d % "0.10.0"
     } ++ Seq(
       PlayImport.ws,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.38.7" % Test,
-      "org.scalameta" %% "munit" % "0.7.12" % Test
+      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.38.8" % Test,
+      "org.scalameta" %% "munit" % "0.7.21" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
@@ -61,8 +61,8 @@ val content = project
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
       "com.malliina" %% "primitives" % "1.17.0",
-      "com.lihaoyi" %% "scalatags" % "0.9.1",
-      "com.typesafe" % "config" % "1.4.0",
+      "com.lihaoyi" %% "scalatags" % "0.9.3",
+      "com.typesafe" % "config" % "1.4.1",
       "com.vladsch.flexmark" % "flexmark" % "0.62.2",
       "org.slf4j" % "slf4j-api" % "1.7.30",
       "ch.qos.logback" % "logback-classic" % "1.2.3",
