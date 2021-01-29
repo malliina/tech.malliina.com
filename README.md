@@ -2,7 +2,7 @@
 
 This is the site [tech.malliina.com](https://tech.malliina.com).
 
-## Process
+## Publishing
 
 1. Add Markdown files to [docs](docs).
 1. [mdoc](mdoc) typechecks Scala code embedded in the Markdown.

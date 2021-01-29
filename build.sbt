@@ -22,13 +22,20 @@ val deploy = inputKey[Unit]("Deploys the site")
 val deployDraft = taskKey[Unit]("Deploys the draft site")
 val deployProd = taskKey[Unit]("Deploys the prod site")
 
+val http4sModules = Seq("blaze-server", "dsl")
+
 val code = project
   .in(file("code"))
   .enablePlugins(PlayScala)
   .settings(
     scalaVersion := scala212,
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= http4sModules.map { m =>
+      "org.http4s" %% s"http4s-$m" % "0.21.16"
+    } ++ Seq("doobie-core", "doobie-hikari").map { d =>
+      "org.tpolecat" %% d % "0.9.4"
+    } ++ Seq(
       PlayImport.ws,
+      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.38.7" % Test,
       "org.scalameta" %% "munit" % "0.7.12" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
