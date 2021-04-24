@@ -28,7 +28,7 @@ jobs:
           sudo dpkg -i sbt-${SBT_VERSION}.deb
       - name: Install Netlify CLI
         run: |
-          sudo npm install netlify-cli -g
+          sudo npm install --unsafe-perm=true netlify-cli@2.59.1 -g
       - name: Run tests
         run: sbt test
       - name: Deploy site

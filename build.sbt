@@ -10,7 +10,7 @@ val npm = taskKey[NPM]("NPM interface")
 val npmBuild = taskKey[Unit]("npm run build")
 val npmKillNode = taskKey[Unit]("Kills node with force")
 val frontendDirectory = settingKey[File]("frontend base dir")
-frontendDirectory in ThisBuild := baseDirectory.value / "frontend"
+ThisBuild / frontendDirectory := baseDirectory.value / "frontend"
 val cleanSite = taskKey[Unit]("Empties the target site dir")
 val cleanDocs = taskKey[Unit]("Empties the target docs dir")
 val siteDir = settingKey[File]("Site target dir")
@@ -49,9 +49,9 @@ val docs = project
     organization := "com.malliina",
     scalaVersion := scala212,
     crossScalaVersions -= scala213,
-    skip.in(publish) := true,
+    publish / skip := true,
     mdocVariables := Map("NAME" -> name.value, "VERSION" -> version.value),
-    mdocOut := (baseDirectory in ThisBuild).value / "target" / "docs"
+    mdocOut := (ThisBuild / baseDirectory).value / "target" / "docs"
   )
 
 val content = project
@@ -69,22 +69,22 @@ val content = project
       "ch.qos.logback" % "logback-core" % "1.2.3"
     ),
     npm := new NPM(
-      (frontendDirectory in ThisBuild).value,
+      (ThisBuild / frontendDirectory).value,
       target.value,
       streams.value.log
     ),
     npmBuild := npm.value.build(),
     watchSources := watchSources.value ++ Seq(
       WatchSource(
-        (frontendDirectory in ThisBuild).value / "src",
+        (ThisBuild / frontendDirectory).value / "src",
         "*.ts" || "*.scss",
         HiddenFileFilter
       ),
-      WatchSource((mdocIn in docs).value)
+      WatchSource((docs / mdocIn).value)
     ),
-    siteDir := (baseDirectory in ThisBuild).value / "target" / "site",
+    siteDir := (ThisBuild / baseDirectory).value / "target" / "site",
     cleanSite := FileIO.deleteDirectory(siteDir.value),
-    docsDir := (baseDirectory in ThisBuild).value / "target" / "docs",
+    docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
     cleanDocs := FileIO.deleteDirectory(docsDir.value),
     prepDirs := {
       // Ownership problems if webpack generates these, apparently
@@ -100,14 +100,14 @@ val content = project
       )
     },
     run := Def.taskDyn {
-      (run in Compile)
-        .dependsOn((mdoc in docs).toTask(""), npmBuild)
+      (Compile / run)
+        .dependsOn((docs / mdoc).toTask(""), npmBuild)
         .dependsOn(prepDirs)
         .toTask(s" ${writeManifest.toTask(" dev").value}")
     }.value,
     build := Def.taskDyn {
-      (run in Compile)
-        .dependsOn((mdoc in docs).toTask(""), npmBuild)
+      (Compile / run)
+        .dependsOn((docs / mdoc).toTask(""), npmBuild)
         .dependsOn(prepDirs)
         .dependsOn(cleanSite, cleanDocs)
         .toTask(s" ${writeManifest.toTask(" prod").value}")
@@ -117,7 +117,7 @@ val content = project
       NPM
         .runProcessSync(
           args.mkString(" "),
-          (baseDirectory in ThisBuild).value,
+          (ThisBuild / baseDirectory).value,
           streams.value.log
         )
     },
@@ -130,8 +130,8 @@ val blog = project
   .in(file("."))
   .aggregate(code, docs, content)
   .settings(
-    deployProd := deployProd.in(content).value,
-    run in Compile := run.in(content).evaluated
+    deployProd := (content / deployProd).value,
+    Compile / run := (content / run).evaluated
   )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
