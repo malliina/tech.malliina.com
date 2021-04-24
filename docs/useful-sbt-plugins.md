@@ -68,6 +68,33 @@ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.1.5")
 Follow the instructions in [mdoc's installation instructions](https://scalameta.org/mdoc/docs/installation.html) to 
 get started.
 
+# sbt-updates
+
+It's professional to keep dependencies in your program up-to-date. Let [sbt-updates](https://github.com/rtimush/sbt-updates) 
+check for updates to dependencies.
+
+Installation:
+
+```scala ignore
+addSbtPlugin("com.timushev.sbt" % "sbt-updates" % "0.5.3")
+```
+
+Then run `dependencyUpdates` to list any available updates to your dependencies.
+
+You may also add sbt-updates as a global sbt plugin by creating a file `~/.sbt/1.0/plugins/sbt-updates.sbt` with the 
+above line. This makes the `dependencyUpdates` command available to all your sbt projects.
+
+Protip: To check for updates to your sbt plugins, open the sbt shell and run `reload plugins` followed by `dependencyUpdates`:
+
+```
+cmd> sbt
+sbt:app> reload plugins
+sbt:project> dependencyUpdates
+sbt:project> reload return
+```
+
+Return to the build of your app with `reload return`.
+
 ## Build your own plugin
 
 If you find yourself repeating the same sbt configurations over multiple projects, consider refactoring your settings

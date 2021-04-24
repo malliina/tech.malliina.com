@@ -3,8 +3,8 @@ import complete.DefaultParsers.spaceDelimited
 
 import play.sbt.PlayImport
 
-val scala212 = "2.12.12"
-val scala213 = "2.13.3"
+val scala212 = "2.12.13"
+val scala213 = "2.13.5"
 
 val npm = taskKey[NPM]("NPM interface")
 val npmBuild = taskKey[Unit]("npm run build")
@@ -35,8 +35,8 @@ val code = project
       "org.tpolecat" %% d % "0.10.0"
     } ++ Seq(
       PlayImport.ws,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.38.8" % Test,
-      "org.scalameta" %% "munit" % "0.7.21" % Test
+      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.39.3" % Test,
+      "org.scalameta" %% "munit" % "0.7.23" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
@@ -61,7 +61,7 @@ val content = project
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
       "com.malliina" %% "primitives" % "1.17.0",
-      "com.lihaoyi" %% "scalatags" % "0.9.3",
+      "com.lihaoyi" %% "scalatags" % "0.9.4",
       "com.typesafe" % "config" % "1.4.1",
       "com.vladsch.flexmark" % "flexmark" % "0.62.2",
       "org.slf4j" % "slf4j-api" % "1.7.30",
