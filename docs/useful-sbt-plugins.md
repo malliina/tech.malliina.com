@@ -85,8 +85,8 @@ Then run sbt command `dependencyUpdates` to list any new versions:
 sbt:app> dependencyUpdates
 ```
 
-You may also add sbt-updates as a global sbt plugin by creating a file `~/.sbt/1.0/plugins/sbt-updates.sbt` with the 
-plugin installation line. This makes command `dependencyUpdates` available to all your sbt projects.
+You may also add sbt-updates as a global sbt plugin by creating a file `~/.sbt/1.0/plugins/sbt-updates.sbt` that contains 
+the plugin installation line. This makes command `dependencyUpdates` available to all your sbt projects.
 
 Protip: To check for updates to sbt plugins, open the sbt shell and run `reload plugins` followed by `dependencyUpdates`:
 
