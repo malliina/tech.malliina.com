@@ -30,9 +30,9 @@ jobs:
         run: |
           sudo npm install --unsafe-perm=true netlify-cli@2.59.1 -g
       - name: Run tests
-        run: sbt test
+        run: sudo sbt test
       - name: Deploy site
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: sbt deployProd
+        run: sudo sbt deployProd

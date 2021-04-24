@@ -25,4 +25,4 @@ jobs:
         run: |
           sudo npm install --unsafe-perm=true netlify-cli@2.59.1 -g
       - name: Run tests
-        run: sbt test
+        run: sudo sbt test
