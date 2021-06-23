@@ -21,6 +21,7 @@ val build = taskKey[Unit]("Builds the site")
 val deploy = inputKey[Unit]("Deploys the site")
 val deployDraft = taskKey[Unit]("Deploys the draft site")
 val deployProd = taskKey[Unit]("Deploys the prod site")
+val Dev = config("dev")
 
 val http4sModules = Seq("blaze-server", "dsl")
 
@@ -56,6 +57,7 @@ val docs = project
 
 val content = project
   .in(file("content"))
+  .enablePlugins(LiveReloadPlugin)
   .settings(
     crossScalaVersions := scala213 :: scala212 :: Nil,
     scalaVersion := scala212,
@@ -83,6 +85,8 @@ val content = project
       WatchSource((docs / mdocIn).value)
     ),
     siteDir := (ThisBuild / baseDirectory).value / "target" / "site",
+    liveReloadRoot := siteDir.value.toPath,
+    refreshBrowsers := refreshBrowsers.triggeredBy(Dev / build).value,
     cleanSite := FileIO.deleteDirectory(siteDir.value),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
     cleanDocs := FileIO.deleteDirectory(docsDir.value),
@@ -99,7 +103,8 @@ val content = project
         (target.value / "manifest.json").toPath
       )
     },
-    run := Def.taskDyn {
+    run := (Dev / build).value,
+    Dev / build := Def.taskDyn {
       (Compile / run)
         .dependsOn((docs / mdoc).toTask(""), npmBuild)
         .dependsOn(prepDirs)
@@ -131,7 +136,8 @@ val blog = project
   .aggregate(code, docs, content)
   .settings(
     deployProd := (content / deployProd).value,
-    Compile / run := (content / run).evaluated
+    Compile / run := (content / run).evaluated,
+    build := (content / build).value
   )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges

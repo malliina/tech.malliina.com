@@ -39,13 +39,16 @@ class NPM(base: File, target: File, log: Logger) {
 
   def install(): Unit = {
     val cacheFile = target / "package-json-last-modified"
-    val cacheLastModified = if (cacheFile.exists()) {
-      try {
-        IO.read(cacheFile).trim.toLong
-      } catch {
-        case _: NumberFormatException => 0L
+    val cacheLastModified: Long =
+      if (cacheFile.exists()) {
+        try {
+          IO.read(cacheFile).trim.toLong
+        } catch {
+          case _: NumberFormatException => 0L
+        }
+      } else {
+        0L
       }
-    }
     val lastModified = (base / "package.json").lastModified()
     // Check if package.json has changed since we last ran this
     if (cacheLastModified != lastModified) {

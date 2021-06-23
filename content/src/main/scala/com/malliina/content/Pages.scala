@@ -3,9 +3,9 @@ package com.malliina.content
 import java.nio.file.{Files, Paths}
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
 import com.malliina.content.Pages._
 import com.malliina.http.FullUrl
+import com.malliina.live.LiveReload
 import scalatags.Text.all._
 import scalatags.text.Builder
 
@@ -75,7 +75,8 @@ class Pages(local: Boolean) {
         meta(property := "og:description", content := globalDescription),
         link(rel := "canonical", href := url),
         styleAt("styles-fonts.css"),
-        styleAt("styles-main.css")
+        styleAt("styles-main.css"),
+        if (local) script(src := LiveReload.script) else modifier()
       ),
       body(
         contents :+ scriptAt("main.js", defer)
