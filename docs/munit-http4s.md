@@ -4,8 +4,8 @@ date: 2021-01-29
 ---
 # MUnit with http4s
 
-[MUnit](https://scalameta.org/munit/ "MUnit website") is a Scala testing library. [Http4s](https://http4s.org/ "http4s website") 
-is a web framework for Scala. To prevent regressions in your code, write integration tests. This post demonstrates how 
+Write integration tests to prevent regressions in your code. [MUnit](https://scalameta.org/munit/ "MUnit website") is a 
+Scala testing library. [Http4s](https://http4s.org/ "http4s website") is a web framework for Scala.  This post demonstrates how 
 to write integration tests for http4s web services using MUnit.
 
 ```scala mdoc:invisible

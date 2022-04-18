@@ -100,16 +100,20 @@ val content = project
     writeManifest := {
       val args: Seq[String] = spaceDelimited("<arg>").parsed
       FileIO.writeJson(
-        SiteManifest(siteDir.value.toPath, docsDir.value.toPath, local = args.contains("dev")),
+        SiteManifest(
+          siteDir.value.toPath,
+          docsDir.value.toPath,
+          local = args.map(_.trim).contains("dev")
+        ),
         (target.value / "manifest.json").toPath
       )
     },
-    run := (Dev / build).value,
     Dev / build := Def.taskDyn {
       (Compile / run)
         .dependsOn((docs / mdoc).toTask(""), npmBuild)
         .dependsOn(prepDirs)
         .toTask(s" ${writeManifest.toTask(" dev").value}")
+        .dependsOn(Def.task(reloader.value.start()))
     }.value,
     build := Def.taskDyn {
       (Compile / run)
@@ -117,7 +121,6 @@ val content = project
         .dependsOn(prepDirs)
         .dependsOn(cleanSite, cleanDocs)
         .toTask(s" ${writeManifest.toTask(" prod").value}")
-        .dependsOn(Def.task(reloader.value.start()))
     }.value,
     deploy := {
       val args = spaceDelimited("<arg>").parsed
@@ -138,7 +141,6 @@ val blog = project
   .aggregate(code, docs, content)
   .settings(
     deployProd := (content / deployProd).value,
-    Compile / run := (content / run).evaluated,
     build := (content / build).value
   )
 

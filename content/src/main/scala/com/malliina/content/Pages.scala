@@ -74,6 +74,7 @@ class Pages(local: Boolean) {
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
         link(rel := "canonical", href := url),
+        link(rel := "shortcut icon", `type` := "image/jpeg", href := findAsset("images/jag.jpg")),
         styleAt("styles-fonts.css"),
         styleAt("styles-main.css"),
         if (local) script(src := LiveReload.script) else modifier()

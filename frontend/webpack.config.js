@@ -25,7 +25,7 @@ module.exports = {
 
   plugins: [
     new MiniCssExtractPlugin({
-      filename: 'css/styles-[name]-[hash].css',
+      filename: 'css/styles-[name]-[fullhash].css',
       chunkFilename: 'styles-[id].css'
     })
   ],
@@ -92,7 +92,7 @@ module.exports = {
         test: /\.(png|woff|woff2|eot|ttf|svg)$/,
         type: 'asset',
         generator: {
-          filename: 'fonts/[name]-[hash][ext]'
+          filename: 'fonts/[name]-[fullhash][ext]'
         },
         parser: {
           dataUrlCondition: {
@@ -107,7 +107,7 @@ module.exports = {
           {
             loader: "file-loader",
             options: {
-              name: "images/[name]-[hash].[ext]"
+              name: "images/[name]-[fullhash].[ext]"
             }
           }
         ]

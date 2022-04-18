@@ -26,6 +26,8 @@ object FileIO {
         Files.createDirectories(dir)
       Files.createFile(to)
     }
+    log.info(s"Writing ${to.toAbsolutePath}...")
+
     Files.write(to, bytes, StandardOpenOption.TRUNCATE_EXISTING)
     log.info(s"Wrote ${to.toAbsolutePath}.")
     to
