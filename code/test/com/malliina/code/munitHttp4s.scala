@@ -76,7 +76,7 @@ trait DatabaseSuite { self: Suite =>
 }
 
 trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
-  val app: Fixture[DatabaseService] = new Fixture[DatabaseService]("database-app") {
+  val app: Fixture[DatabaseService] = new Fixture[DatabaseService]("db-app") {
     private var service: Option[DatabaseService] = None
     val promise = Promise[IO[Unit]]()
 
