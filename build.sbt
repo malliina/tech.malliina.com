@@ -3,8 +3,8 @@ import complete.DefaultParsers.spaceDelimited
 
 import play.sbt.PlayImport
 
-val scala212 = "2.12.13"
-val scala213 = "2.13.5"
+val scala212 = "2.12.15"
+val scala213 = "2.13.8"
 
 val npm = taskKey[NPM]("NPM interface")
 val npmBuild = taskKey[Unit]("npm run build")
@@ -31,13 +31,13 @@ val code = project
   .settings(
     scalaVersion := scala212,
     libraryDependencies ++= http4sModules.map { m =>
-      "org.http4s" %% s"http4s-$m" % "0.21.16"
+      "org.http4s" %% s"http4s-$m" % "0.23.11"
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
-      "org.tpolecat" %% d % "0.10.0"
+      "org.tpolecat" %% d % "1.0.0-RC2"
     } ++ Seq(
       PlayImport.ws,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.39.3" % Test,
-      "org.scalameta" %% "munit" % "0.7.23" % Test
+      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.40.5" % Test,
+      "org.scalameta" %% "munit" % "0.7.29" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
@@ -62,13 +62,14 @@ val content = project
     crossScalaVersions := scala213 :: scala212 :: Nil,
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
-      "com.malliina" %% "primitives" % "1.17.0",
-      "com.lihaoyi" %% "scalatags" % "0.9.4",
-      "com.typesafe" % "config" % "1.4.1",
-      "com.vladsch.flexmark" % "flexmark" % "0.62.2",
-      "org.slf4j" % "slf4j-api" % "1.7.30",
-      "ch.qos.logback" % "logback-classic" % "1.2.3",
-      "ch.qos.logback" % "logback-core" % "1.2.3"
+      "com.typesafe.play" %% "play-json" % "2.9.2",
+      "com.malliina" %% "primitives" % "3.1.3",
+      "com.lihaoyi" %% "scalatags" % "0.11.1",
+      "com.typesafe" % "config" % "1.4.2",
+      "com.vladsch.flexmark" % "flexmark" % "0.64.0",
+      "org.slf4j" % "slf4j-api" % "1.7.36",
+      "ch.qos.logback" % "logback-classic" % "1.2.11",
+      "ch.qos.logback" % "logback-core" % "1.2.11"
     ),
     npm := new NPM(
       (ThisBuild / frontendDirectory).value,
@@ -116,6 +117,7 @@ val content = project
         .dependsOn(prepDirs)
         .dependsOn(cleanSite, cleanDocs)
         .toTask(s" ${writeManifest.toTask(" prod").value}")
+        .dependsOn(Def.task(reloader.value.start()))
     }.value,
     deploy := {
       val args = spaceDelimited("<arg>").parsed

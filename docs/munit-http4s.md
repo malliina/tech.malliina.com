@@ -10,7 +10,8 @@ to write integration tests for http4s web services using MUnit.
 
 ```scala mdoc:invisible
 import cats.data.Kleisli
-import cats.effect.{Blocker, ContextShift, ExitCode, IO, IOApp, Resource, Timer}
+import cats.effect.unsafe.implicits.global
+import cats.effect.{ExitCode, IO, IOApp, Resource}
 import cats.syntax.flatMap._
 import com.dimafeng.testcontainers.MySQLContainer
 import doobie.hikari._
@@ -21,7 +22,7 @@ import org.http4s._
 import org.http4s.implicits._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
-import org.http4s.server.blaze.BlazeServerBuilder
+import org.http4s.blaze.server.BlazeServerBuilder
 import scala.concurrent.{ExecutionContext, Promise}
 ```
 
@@ -39,7 +40,7 @@ class AppService extends Http4sDsl[IO] {
 object AppServer extends IOApp {
   type Routes = Kleisli[IO, Request[IO], Response[IO]]
   val app: Routes = new AppService().routes
-  val server = BlazeServerBuilder[IO](ExecutionContext.global)
+  val server = BlazeServerBuilder[IO]
     .bindHttp(port = 9000, "0.0.0.0")
     .withHttpApp(app)
   override def run(args: List[String]): IO[ExitCode] = 
@@ -115,41 +116,41 @@ First, our app that uses a database now looks like this:
 ```scala mdoc:silent
 case class DatabaseConf(url: String, user: String, pass: String)
 
-class DatabaseService(database: HikariTransactor[IO]) 
-  extends Http4sDsl[IO] {
-  val routes = HttpRoutes.of[IO] {
-    case GET -> Root / "ping" => Ok("pong")
-  }.orNotFound
+class DatabaseService(database: HikariTransactor[IO]) extends Http4sDsl[IO] {
+  val routes = HttpRoutes
+    .of[IO] {
+      case GET -> Root / "ping" => Ok("pong")
+    }
+    .orNotFound
 }
 
 object DatabaseApp extends IOApp {
   def appResource(conf: DatabaseConf): Resource[IO, DatabaseService] =
     for {
       ce <- ExecutionContexts.fixedThreadPool[IO](32)
-      blocker <- Blocker[IO]
       transactor <- HikariTransactor.newHikariTransactor[IO](
         "com.mysql.jdbc.Driver",
         conf.url,
         conf.user,
         conf.pass,
-        ce,
-        blocker
+        ce
       )
     } yield new DatabaseService(transactor)
-    
+
   def buildServer(conf: DatabaseConf) = for {
     app <- appResource(conf)
-    server <- BlazeServerBuilder[IO](ExecutionContext.global)
+    server <- BlazeServerBuilder[IO]
       .bindHttp(port = 9000, "0.0.0.0")
       .withHttpApp(app.routes)
       .resource
   } yield server
-  
-  override def run(args: List[String]): IO[ExitCode] = 
+
+  override def run(args: List[String]): IO[ExitCode] =
     buildServer(readConf).use(_ => IO.never).as(ExitCode.Success)
-    
+
   def readConf: DatabaseConf = ???
 }
+
 ```
 
 (You might read the database configuration from environment variables in a production setting, but I leave that up to you.)
@@ -164,7 +165,7 @@ trait DatabaseSuite { self: Suite =>
   val db: Fixture[DatabaseConf] = new Fixture[DatabaseConf]("database") {
     var container: Option[MySQLContainer] = None
     var conf: Option[DatabaseConf] = None
-    def apply() = conf.get
+    def apply(): DatabaseConf = conf.get
     override def beforeAll(): Unit = {
       val image = DockerImageName.parse("mysql:5.7.29")
       val cont = MySQLContainer(mysqlImageVersion = image)
@@ -190,10 +191,7 @@ Now we create a master test suite that starts a database and launches an http4s 
 
 ```scala mdoc:silent
 trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
-  implicit def munitContextShift: ContextShift[IO] =
-    IO.contextShift(munitExecutionContext)
-    
-  val app = new Fixture[DatabaseService]("database-app") {
+  val app: Fixture[DatabaseService] = new Fixture[DatabaseService]("database-app") {
     private var service: Option[DatabaseService] = None
     val promise = Promise[IO[Unit]]()
 
@@ -201,21 +199,19 @@ trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
 
     override def beforeAll(): Unit = {
       val resource = DatabaseApp.appResource(db())
-      val resourceEffect = resource.allocated[IO, DatabaseService]
+      val resourceEffect = resource.allocated[DatabaseService]
       val setupEffect =
-        resourceEffect
-          .map { case (t, release) =>
+        resourceEffect.map {
+          case (t, release) =>
             promise.success(release)
             t
-          }
-          .flatTap(t => IO.pure(()))
+        }.flatTap(t => IO.pure(()))
 
       service = Option(setupEffect.unsafeRunSync())
     }
 
     override def afterAll(): Unit = {
-      IO.fromFuture(IO(promise.future))(munitContextShift)
-        .flatten.unsafeRunSync()
+      IO.fromFuture(IO(promise.future)).flatten.unsafeRunSync()
     }
   }
 
