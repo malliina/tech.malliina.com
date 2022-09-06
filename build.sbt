@@ -3,7 +3,7 @@ import complete.DefaultParsers.spaceDelimited
 
 import play.sbt.PlayImport
 
-val scala212 = "2.12.15"
+val scala212 = "2.12.16"
 val scala213 = "2.13.8"
 
 val npm = taskKey[NPM]("NPM interface")
@@ -31,12 +31,12 @@ val code = project
   .settings(
     scalaVersion := scala212,
     libraryDependencies ++= http4sModules.map { m =>
-      "org.http4s" %% s"http4s-$m" % "0.23.11"
+      "org.http4s" %% s"http4s-$m" % "0.23.12"
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
       "org.tpolecat" %% d % "1.0.0-RC2"
     } ++ Seq(
       PlayImport.ws,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.40.5" % Test,
+      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.40.10" % Test,
       "org.scalameta" %% "munit" % "0.7.29" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
@@ -63,7 +63,7 @@ val content = project
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play-json" % "2.9.2",
-      "com.malliina" %% "primitives" % "3.1.3",
+      "com.malliina" %% "primitives" % "3.2.0",
       "com.lihaoyi" %% "scalatags" % "0.11.1",
       "com.typesafe" % "config" % "1.4.2",
       "com.vladsch.flexmark" % "flexmark" % "0.64.0",
