@@ -1,4 +1,4 @@
-import NPM.{runProcessSync, buildCommand, installCommand, watchCommand}
+import NPM.{runProcessSync, buildCommand, installCommand}
 import sbt._
 
 import scala.sys.process.Process
@@ -61,12 +61,6 @@ class NPM(base: File, target: File, log: Logger) {
     install()
     runProcessSync(buildCommand, base, log)
   }
-
-//  def watch(): Unit = {
-//    val cmd = NPM.canonical(watchCommand)
-//    log.info(s"Watching with '$cmd'...")
-//    watchProcess = Some(Process(cmd, base).run(log))
-//  }
 
   def stop(): Unit = {
     watchProcess.foreach(_.destroy())

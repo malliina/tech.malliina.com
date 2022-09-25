@@ -6,18 +6,18 @@ import java.nio.file.attribute.BasicFileAttributes
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{Format, Json, Reads, Writes}
 
+sealed abstract class Mode(val name: String)
+
+object Mode {
+  case object Prod extends Mode("prod")
+  case object Dev extends Mode("dev")
+}
+
 object AppLogger {
   def apply(cls: Class[_]): Logger = {
     val name = cls.getName.reverse.dropWhile(_ == '$').reverse
     LoggerFactory.getLogger(name)
   }
-}
-
-case class SiteManifest(distDir: Path, docsDir: Path, local: Boolean)
-
-object SiteManifest {
-  implicit val pf = FileIO.pathFormat
-  implicit val json = Json.format[SiteManifest]
 }
 
 object FileIO {

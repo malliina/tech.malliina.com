@@ -1,4 +1,3 @@
-import java.nio.file.Path
 import complete.DefaultParsers.spaceDelimited
 
 import play.sbt.PlayImport
@@ -16,7 +15,6 @@ val cleanDocs = taskKey[Unit]("Empties the target docs dir")
 val siteDir = settingKey[File]("Site target dir")
 val docsDir = settingKey[File]("Docs target dir")
 val prepDirs = taskKey[Unit]("Creates directories")
-val writeManifest = inputKey[Path]("Writes the manifest file")
 val build = taskKey[Unit]("Builds the site")
 val deploy = inputKey[Unit]("Deploys the site")
 val deployDraft = taskKey[Unit]("Deploys the draft site")
@@ -24,6 +22,8 @@ val deployProd = taskKey[Unit]("Deploys the prod site")
 val Dev = config("dev")
 
 val http4sModules = Seq("blaze-server", "dsl")
+
+//val Aaa = DevMode
 
 val code = project
   .in(file("code"))
@@ -57,12 +57,12 @@ val docs = project
 
 val content = project
   .in(file("content"))
-  .enablePlugins(LiveReloadPlugin)
+  .enablePlugins(GeneratorPlugin)
   .settings(
     crossScalaVersions := scala213 :: scala212 :: Nil,
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play-json" % "2.9.2",
+      "com.typesafe.play" %% "play-json" % "2.9.3",
       "com.malliina" %% "primitives" % "3.2.0",
       "com.lihaoyi" %% "scalatags" % "0.11.1",
       "com.typesafe" % "config" % "1.4.2",
@@ -97,30 +97,19 @@ val content = project
       Seq(assetsDir / "css", assetsDir / "fonts").map(_.mkdirs())
     },
     npmKillNode := npm.value.stop(),
-    writeManifest := {
-      val args: Seq[String] = spaceDelimited("<arg>").parsed
-      FileIO.writeJson(
-        SiteManifest(
-          siteDir.value.toPath,
-          docsDir.value.toPath,
-          local = args.map(_.trim).contains("dev")
-        ),
-        (target.value / "manifest.json").toPath
-      )
-    },
     Dev / build := Def.taskDyn {
       (Compile / run)
+        .toTask(" ")
         .dependsOn((docs / mdoc).toTask(""), npmBuild)
         .dependsOn(prepDirs)
-        .toTask(s" ${writeManifest.toTask(" dev").value}")
         .dependsOn(Def.task(reloader.value.start()))
     }.value,
     build := Def.taskDyn {
       (Compile / run)
+        .toTask(" ")
         .dependsOn((docs / mdoc).toTask(""), npmBuild)
         .dependsOn(prepDirs)
         .dependsOn(cleanSite, cleanDocs)
-        .toTask(s" ${writeManifest.toTask(" prod").value}")
     }.value,
     deploy := {
       val args = spaceDelimited("<arg>").parsed
@@ -133,7 +122,13 @@ val content = project
     },
     deploy := deploy.dependsOn(build).evaluated,
     deployProd := deploy.toTask(" netlify deploy --prod").value,
-    deployDraft := deploy.toTask(" netlify deploy").value
+    deployDraft := deploy.toTask(" netlify deploy").value,
+    buildInfoKeys ++= Seq[BuildInfoKey](
+      "siteDir" -> siteDir.value,
+      "docsDir" -> docsDir.value,
+      "isProd" -> ((Global / mode).value == Mode.Prod),
+      "mode" -> (Global / mode).value
+    )
   )
 
 val blog = project

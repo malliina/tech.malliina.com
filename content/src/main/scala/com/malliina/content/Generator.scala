@@ -1,26 +1,21 @@
 package com.malliina.content
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, Paths}
+import buildinfo.BuildInfo
 
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Path}
 import com.malliina.content.netlify.{NetlifyClient, RedirectEntry}
-import play.api.libs.json.Json
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
 case class SiteManifest(distDir: Path, docsDir: Path, local: Boolean)
 
-object SiteManifest {
-  implicit val pf = Formats.pathFormat
-  implicit val json = Json.format[SiteManifest]
-}
-
 object Generator {
   private val log = AppLogger(getClass)
 
   def main(args: Array[String]): Unit = {
-    val manifestPath = Paths.get(args(0))
-    val manifest = Json.parse(Files.readAllBytes(manifestPath)).as[SiteManifest]
+    val manifest =
+      SiteManifest(BuildInfo.siteDir.toPath, BuildInfo.docsDir.toPath, !BuildInfo.isProd)
     run(manifest)
   }
 
