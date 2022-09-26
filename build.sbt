@@ -16,9 +16,7 @@ val siteDir = settingKey[File]("Site target dir")
 val docsDir = settingKey[File]("Docs target dir")
 val prepDirs = taskKey[Unit]("Creates directories")
 val build = taskKey[Unit]("Builds the site")
-val deploy = inputKey[Unit]("Deploys the site")
-val deployDraft = taskKey[Unit]("Deploys the draft site")
-val deployProd = taskKey[Unit]("Deploys the prod site")
+val deploy = taskKey[Unit]("Deploys the site")
 val Dev = config("dev")
 
 val http4sModules = Seq("blaze-server", "dsl")
@@ -86,7 +84,6 @@ val content = project
       WatchSource((docs / mdocIn).value)
     ),
     siteDir := (ThisBuild / baseDirectory).value / "target" / "site",
-    liveReloadRoot := siteDir.value.toPath,
     refreshBrowsers := refreshBrowsers.triggeredBy(Dev / build).value,
     cleanSite := FileIO.deleteDirectory(siteDir.value),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
@@ -97,13 +94,6 @@ val content = project
       Seq(assetsDir / "css", assetsDir / "fonts").map(_.mkdirs())
     },
     npmKillNode := npm.value.stop(),
-    Dev / build := Def.taskDyn {
-      (Compile / run)
-        .toTask(" ")
-        .dependsOn((docs / mdoc).toTask(""), npmBuild)
-        .dependsOn(prepDirs)
-        .dependsOn(Def.task(reloader.value.start()))
-    }.value,
     build := Def.taskDyn {
       (Compile / run)
         .toTask(" ")
@@ -111,23 +101,26 @@ val content = project
         .dependsOn(prepDirs)
         .dependsOn(cleanSite, cleanDocs)
     }.value,
+    Dev / build := Def.taskDyn {
+      (Compile / run)
+        .toTask(" ")
+        .dependsOn((docs / mdoc).toTask(""), npmBuild)
+        .dependsOn(prepDirs)
+        .dependsOn(Def.task(reloader.value.start()))
+    }.value,
     deploy := {
-      val args = spaceDelimited("<arg>").parsed
+      val isProd = (Global / mode).value == Mode.Prod
+      val cmd = if (isProd) "netlify deploy --prod" else "netlify deploy"
       NPM
         .runProcessSync(
-          args.mkString(" "),
+          cmd,
           (ThisBuild / baseDirectory).value,
           streams.value.log
         )
     },
-    deploy := deploy.dependsOn(build).evaluated,
-    deployProd := deploy.toTask(" netlify deploy --prod").value,
-    deployDraft := deploy.toTask(" netlify deploy").value,
+    deploy := deploy.dependsOn(build).value,
     buildInfoKeys ++= Seq[BuildInfoKey](
-      "siteDir" -> siteDir.value,
-      "docsDir" -> docsDir.value,
-      "isProd" -> ((Global / mode).value == Mode.Prod),
-      "mode" -> (Global / mode).value
+      "docsDir" -> docsDir.value
     )
   )
 
@@ -135,7 +128,7 @@ val blog = project
   .in(file("."))
   .aggregate(code, docs, content)
   .settings(
-    deployProd := (content / deployProd).value,
+    deploy := (content / deploy).value,
     build := (content / build).value
   )
 

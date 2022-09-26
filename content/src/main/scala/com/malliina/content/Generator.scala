@@ -8,11 +8,7 @@ import com.malliina.content.netlify.{NetlifyClient, RedirectEntry}
 
 import scala.collection.JavaConverters.asScalaIteratorConverter
 
-case class SiteManifest(distDir: Path, docsDir: Path, local: Boolean)
-
 object Generator {
-  private val log = AppLogger(getClass)
-
   def main(args: Array[String]): Unit = {
     val manifest =
       SiteManifest(BuildInfo.siteDir.toPath, BuildInfo.docsDir.toPath, !BuildInfo.isProd)
@@ -38,14 +34,19 @@ object Generator {
       val noExt = markdownFile.getFileName.toString.dropRight(ext.length)
       val out = distDir.resolve(s"$noExt.html")
       val url = domain / noExt
-      val htmlFile = pages.page(post.title, url, html).write(out)
+      val page = pages.page(post.title, url, html)
+      val htmlFile = page.write(out)
       post.meta.map { meta =>
         MarkdownPage(htmlFile, meta.title, url, meta.date)
       }
     }
     val newestFirst = markdownPages.sortBy(_.date.toEpochDay).reverse
     val listUrl = domain / pages.remoteListUri
-    pages.list("Posts", listUrl, newestFirst).write(distDir.resolve(pages.listFile))
+    val listPage = pages.list("Posts", listUrl, newestFirst)
+    listPage.write(distDir.resolve(pages.listFile))
+    if (manifest.local) {
+      listPage.write(distDir.resolve("index.html"))
+    }
     SEO.write(markdownPages.map(_.url) :+ listUrl, domain, distDir)
     NetlifyClient.writeRedirects(Seq(RedirectEntry("/*", s"/${pages.listUri}", 302)), distDir)
     NetlifyClient.writeHeaders(distDir)

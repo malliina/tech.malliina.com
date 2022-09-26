@@ -11,6 +11,8 @@ import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.language.implicitConversions
 import scala.util.Try
 
+case class SiteManifest(distDir: Path, docsDir: Path, local: Boolean)
+
 case class Html(html: String) extends AnyVal
 
 object Html {
