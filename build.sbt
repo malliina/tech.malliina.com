@@ -79,7 +79,6 @@ val content = project
       WatchSource((docs / mdocIn).value)
     ),
     siteDir := (ThisBuild / baseDirectory).value / "target" / "site",
-    refreshBrowsers := refreshBrowsers.triggeredBy(build).value,
     cleanSite := FileIO.deleteDirectory(siteDir.value),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
     cleanDocs := FileIO.deleteDirectory(docsDir.value),
@@ -98,12 +97,11 @@ val content = project
     }.value,
     deploy := {
       val cmd = if (isProd.value) "netlify deploy --prod" else "netlify deploy"
-      NPM
-        .runProcessSync(
-          cmd,
-          (ThisBuild / baseDirectory).value,
-          streams.value.log
-        )
+      NPM.runProcessSync(
+        cmd,
+        (ThisBuild / baseDirectory).value,
+        streams.value.log
+      )
     },
     deploy := deploy.dependsOn(build).value,
     buildInfoKeys ++= Seq[BuildInfoKey](
@@ -113,9 +111,10 @@ val content = project
 
 val blog = project
   .in(file("."))
-  .aggregate(code, docs, content)
+  .aggregate(docs, content)
   .settings(
-    deploy := (content / deploy).value
+    deploy := (content / deploy).value,
+    build := (content / build).value
   )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges

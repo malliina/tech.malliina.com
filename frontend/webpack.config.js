@@ -6,7 +6,6 @@ const srcDir = path.resolve(rootDir, 'src');
 
 module.exports = {
   entry: {
-    // lib: [path.resolve(srcDir, './highlight.scala.js')],
     main: [path.resolve(srcDir, './index.ts')],
     fonts: [path.resolve(srcDir, './fonts.ts')],
   },
@@ -15,11 +14,9 @@ module.exports = {
     path: path.resolve(rootDir, '../target/site/assets')
   },
   mode: "production",
-  // Enable sourcemaps for debugging webpack's output.
   devtool: "source-map",
 
   resolve: {
-    // Add '.ts' and '.tsx' as resolvable extensions.
     extensions: [".ts", ".scss", ".js"]
   },
 
@@ -41,12 +38,6 @@ module.exports = {
           }
         ]
       },
-      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-      // {
-      //   enforce: "pre",
-      //   test: /\.js$/,
-      //   loader: "source-map-loader"
-      // },
       {
         test: /\.css$/,
         use: [

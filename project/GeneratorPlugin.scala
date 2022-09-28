@@ -1,5 +1,5 @@
 import com.malliina.live.LiveReloadPlugin
-import com.malliina.live.LiveReloadPlugin.autoImport.liveReloadRoot
+import com.malliina.live.LiveReloadPlugin.autoImport.{liveReloadRoot, refreshBrowsers}
 import sbt.{AutoPlugin, Global, Plugins, Setting, settingKey}
 import sbtbuildinfo.BuildInfoPlugin
 import sbtbuildinfo.BuildInfoPlugin.autoImport.{BuildInfoKey, buildInfoKeys}
@@ -19,6 +19,7 @@ object GeneratorPlugin extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
     isProd := ((Global / mode).value == Mode.Prod),
     liveReloadRoot := siteDir.value.toPath,
+    refreshBrowsers := refreshBrowsers.triggeredBy(build).value,
     buildInfoKeys ++= Seq[BuildInfoKey](
       "siteDir" -> siteDir.value,
       "isProd" -> isProd.value,
