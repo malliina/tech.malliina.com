@@ -1,5 +1,3 @@
-import complete.DefaultParsers.spaceDelimited
-
 import play.sbt.PlayImport
 
 val scala212 = "2.12.16"
@@ -17,11 +15,8 @@ val docsDir = settingKey[File]("Docs target dir")
 val prepDirs = taskKey[Unit]("Creates directories")
 val build = taskKey[Unit]("Builds the site")
 val deploy = taskKey[Unit]("Deploys the site")
-val Dev = config("dev")
 
 val http4sModules = Seq("blaze-server", "dsl")
-
-//val Aaa = DevMode
 
 val code = project
   .in(file("code"))
@@ -84,7 +79,7 @@ val content = project
       WatchSource((docs / mdocIn).value)
     ),
     siteDir := (ThisBuild / baseDirectory).value / "target" / "site",
-    refreshBrowsers := refreshBrowsers.triggeredBy(Dev / build).value,
+    refreshBrowsers := refreshBrowsers.triggeredBy(build).value,
     cleanSite := FileIO.deleteDirectory(siteDir.value),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
     cleanDocs := FileIO.deleteDirectory(docsDir.value),
@@ -99,18 +94,10 @@ val content = project
         .toTask(" ")
         .dependsOn((docs / mdoc).toTask(""), npmBuild)
         .dependsOn(prepDirs)
-        .dependsOn(cleanSite, cleanDocs)
-    }.value,
-    Dev / build := Def.taskDyn {
-      (Compile / run)
-        .toTask(" ")
-        .dependsOn((docs / mdoc).toTask(""), npmBuild)
-        .dependsOn(prepDirs)
-        .dependsOn(Def.task(reloader.value.start()))
+        .dependsOn(Def.task(if (isProd.value) () else reloader.value.start()))
     }.value,
     deploy := {
-      val isProd = (Global / mode).value == Mode.Prod
-      val cmd = if (isProd) "netlify deploy --prod" else "netlify deploy"
+      val cmd = if (isProd.value) "netlify deploy --prod" else "netlify deploy"
       NPM
         .runProcessSync(
           cmd,
@@ -128,8 +115,7 @@ val blog = project
   .in(file("."))
   .aggregate(code, docs, content)
   .settings(
-    deploy := (content / deploy).value,
-    build := (content / build).value
+    deploy := (content / deploy).value
   )
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
