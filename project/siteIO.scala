@@ -5,6 +5,7 @@ import java.nio.file.attribute.BasicFileAttributes
 
 import org.slf4j.{Logger, LoggerFactory}
 import play.api.libs.json.{Format, Json, Reads, Writes}
+import io.circe._
 
 sealed abstract class Mode(val name: String)
 
@@ -14,7 +15,7 @@ object Mode {
 }
 
 object AppLogger {
-  def apply(cls: Class[_]): Logger = {
+  def apply(cls: Class[?]): Logger = {
     val name = cls.getName.reverse.dropWhile(_ == '$').reverse
     LoggerFactory.getLogger(name)
   }
@@ -23,9 +24,9 @@ object AppLogger {
 object FileIO {
   private val log = AppLogger(getClass)
 
-  implicit val pathFormat: Format[Path] = Format[Path](
-    Reads(json => json.validate[String].map(s => Paths.get(s))),
-    Writes(p => Json.toJson(p.toAbsolutePath.toString))
+  implicit val pathCodec: Codec[Path] = Codec.from(
+    Decoder.decodeString.map(s => Paths.get(s)),
+    Encoder.encodeString.contramap(p => p.toAbsolutePath.toString)
   )
 
   def writeJson[T: Writes](t: T, to: Path): Path =

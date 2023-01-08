@@ -1,7 +1,8 @@
 import play.sbt.PlayImport
 
 val scala212 = "2.12.16"
-val scala213 = "2.13.8"
+val scala213 = "2.13.10"
+val scala3 = "3.2.1"
 
 val npm = taskKey[NPM]("NPM interface")
 val npmBuild = taskKey[Unit]("npm run build")
@@ -29,7 +30,7 @@ val code = project
       "org.tpolecat" %% d % "1.0.0-RC2"
     } ++ Seq(
       PlayImport.ws,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.40.10" % Test,
+      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.40.12" % Test,
       "org.scalameta" %% "munit" % "0.7.29" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
@@ -55,14 +56,12 @@ val content = project
     crossScalaVersions := scala213 :: scala212 :: Nil,
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play-json" % "2.9.3",
-      "com.malliina" %% "primitives" % "3.2.0",
-      "com.lihaoyi" %% "scalatags" % "0.11.1",
+      "com.malliina" %% "primitives" % "3.4.0",
+      "com.lihaoyi" %% "scalatags" % "0.12.0",
       "com.typesafe" % "config" % "1.4.2",
       "com.vladsch.flexmark" % "flexmark" % "0.64.0",
-      "org.slf4j" % "slf4j-api" % "1.7.36",
-      "ch.qos.logback" % "logback-classic" % "1.2.11",
-      "ch.qos.logback" % "logback-core" % "1.2.11"
+      "ch.qos.logback" % "logback-classic" % "1.4.5",
+      "ch.qos.logback" % "logback-core" % "1.4.5"
     ),
     npm := new NPM(
       (ThisBuild / frontendDirectory).value,
