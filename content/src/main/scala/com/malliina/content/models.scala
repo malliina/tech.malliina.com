@@ -21,7 +21,7 @@ object Html {
 
 case class Markdown(content: String) extends AnyVal
 
-case class PostMeta(title: String, date: LocalDate)
+case class PostMeta(title: String, date: LocalDate, updated: LocalDate)
 
 case class MarkdownPost(content: Markdown, meta: Option[PostMeta]) {
   def title = meta.map(_.title).getOrElse("Tech")
@@ -43,7 +43,8 @@ object MarkdownPost {
     val meta = for {
       title <- get("title")
       date <- get("date").map(d => LocalDate.parse(d))
-    } yield PostMeta(title, date)
+      updated = get("updated").map(u => LocalDate.parse(u)).getOrElse(date)
+    } yield PostMeta(title, date, updated)
     MarkdownPost(Markdown(content.mkString("\n")), meta)
   }
 }
