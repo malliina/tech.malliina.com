@@ -4,18 +4,9 @@ val scala212 = "2.12.16"
 val scala213 = "2.13.10"
 val scala3 = "3.2.1"
 
-val npm = taskKey[NPM]("NPM interface")
-val npmBuild = taskKey[Unit]("npm run build")
-val npmKillNode = taskKey[Unit]("Kills node with force")
 val frontendDirectory = settingKey[File]("frontend base dir")
 ThisBuild / frontendDirectory := baseDirectory.value / "frontend"
-val cleanSite = taskKey[Unit]("Empties the target site dir")
-val cleanDocs = taskKey[Unit]("Empties the target docs dir")
-val siteDir = settingKey[File]("Site target dir")
 val docsDir = settingKey[File]("Docs target dir")
-val prepDirs = taskKey[Unit]("Creates directories")
-val build = taskKey[Unit]("Builds the site")
-val deploy = taskKey[Unit]("Deploys the site")
 
 val http4sModules = Seq("blaze-server", "dsl")
 
@@ -43,16 +34,21 @@ val docs = project
   .settings(
     organization := "com.malliina",
     scalaVersion := scala213,
-    // crossScalaVersions -= scala213,
     publish / skip := true,
     mdocVariables := Map("NAME" -> name.value, "VERSION" -> version.value),
     mdocOut := (ThisBuild / baseDirectory).value / "target" / "docs"
   )
 
+val frontend = project
+  .in(file("frontend"))
+  .enablePlugins(NodeJsPlugin, RollupPlugin)
+
 val content = project
   .in(file("content"))
-  .enablePlugins(GeneratorPlugin)
+  .enablePlugins(NetlifyPlugin)
   .settings(
+    scalajsProject := frontend,
+    copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     crossScalaVersions := scala213 :: scala212 :: Nil,
     scalaVersion := scala212,
     libraryDependencies ++= Seq(
@@ -63,46 +59,8 @@ val content = project
       "ch.qos.logback" % "logback-classic" % "1.4.5",
       "ch.qos.logback" % "logback-core" % "1.4.5"
     ),
-    npm := new NPM(
-      (ThisBuild / frontendDirectory).value,
-      target.value,
-      streams.value.log
-    ),
-    npmBuild := npm.value.build(),
-    watchSources := watchSources.value ++ Seq(
-      WatchSource(
-        (ThisBuild / frontendDirectory).value / "src",
-        "*.ts" || "*.scss",
-        HiddenFileFilter
-      ),
-      WatchSource((docs / mdocIn).value)
-    ),
-    siteDir := (ThisBuild / baseDirectory).value / "target" / "site",
-    cleanSite := FileIO.deleteDirectory(siteDir.value),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
-    cleanDocs := FileIO.deleteDirectory(docsDir.value),
-    prepDirs := {
-      // Ownership problems if webpack generates these, apparently
-      val assetsDir = siteDir.value / "assets"
-      Seq(assetsDir / "css", assetsDir / "fonts").map(_.mkdirs())
-    },
-    npmKillNode := npm.value.stop(),
-    build := Def.taskDyn {
-      (Compile / run)
-        .toTask(" ")
-        .dependsOn((docs / mdoc).toTask(""), npmBuild)
-        .dependsOn(prepDirs)
-        .dependsOn(Def.task(if (isProd.value) () else reloader.value.start()))
-    }.value,
-    deploy := {
-      val cmd = if (isProd.value) "netlify deploy --prod" else "netlify deploy"
-      NPM.runProcessSync(
-        cmd,
-        (ThisBuild / baseDirectory).value,
-        streams.value.log
-      )
-    },
-    deploy := deploy.dependsOn(build).value,
+    build := build.dependsOn((docs / mdoc).toTask("")).value,
     buildInfoKeys ++= Seq[BuildInfoKey](
       "docsDir" -> docsDir.value
     )
@@ -110,7 +68,7 @@ val content = project
 
 val blog = project
   .in(file("."))
-  .aggregate(docs, content)
+  .aggregate(docs, frontend, content)
   .settings(
     deploy := (content / deploy).value,
     build := (content / build).value

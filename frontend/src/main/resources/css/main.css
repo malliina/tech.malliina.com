@@ -37,8 +37,6 @@ pre {
   margin-bottom: 20px;
 }
 
-
-
 ol, ul {
   margin: 0;
   padding: 0;
@@ -59,7 +57,7 @@ footer {
   align-items: center;
   height: 200px;
 
-  a {
+  & a {
     text-decoration: none;
     display: block;
     text-align: center;
@@ -90,7 +88,7 @@ code {
 
 .post-item {
   margin: 32px 0;
-  a {
+  & a {
     display: block;
     margin-bottom: 8px;
   }

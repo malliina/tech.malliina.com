@@ -1,15 +1,14 @@
 package com.malliina.content
 
-import java.nio.file.{Files, Paths}
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import com.malliina.content.Pages._
 import com.malliina.http.FullUrl
 import com.malliina.live.LiveReload
+import com.malliina.sitegen.HashedAssets
 import scalatags.Text.all._
 import scalatags.text.Builder
 
-import scala.collection.JavaConverters.asScalaIteratorConverter
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 object Pages {
   def apply(local: Boolean): Pages = new Pages(local)
@@ -60,7 +59,7 @@ class Pages(local: Boolean) {
         meta(charset := "UTF-8"),
         meta(
           name := "viewport",
-          content := "width=device-width, initial-scale=1.0, maximum-scale=1.0"
+          content := "width=device-width, initial-scale=1.0"
         ),
         meta(name := "description", content := globalDescription),
         meta(
@@ -70,17 +69,21 @@ class Pages(local: Boolean) {
         meta(name := "twitter:card", content := "summary"),
         meta(name := "twitter:site", content := "@kungmalle"),
         meta(name := "twitter:creator", content := "@kungmalle"),
-        meta(name := "og:image", content := (Pages.domain / findAsset("images/jag.jpg"))),
+        meta(name := "og:image", content := (Pages.domain / findAsset("img/jag.jpg"))),
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
         link(rel := "canonical", href := url),
-        link(rel := "shortcut icon", `type` := "image/jpeg", href := findAsset("images/jag.jpg")),
-        styleAt("styles-fonts.css"),
-        styleAt("styles-main.css"),
+        link(
+          rel := "shortcut icon",
+          `type` := "image/jpeg",
+          href := inlineOrAsset("img/jag.jpg")
+        ),
+        styleAt("fonts.css"),
+        styleAt("styles.css"),
         if (local) script(src := LiveReload.script) else modifier()
       ),
       body(
-        contents :+ scriptAt("main.js", defer)
+        contents :+ scriptAt("frontend.js", defer)
       )
     )
   )
@@ -91,31 +94,14 @@ class Pages(local: Boolean) {
   }
 
   def styleAt(file: String) =
-    link(rel := "stylesheet", href := findAsset(s"css/$file"))
+    link(rel := "stylesheet", href := findAsset(file))
 
   def scriptAt(file: String, modifiers: Modifier*) = script(src := findAsset(file), modifiers)
 
+  def inlineOrAsset(file: String) = HashedAssets.dataUris.getOrElse(file, findAsset(file))
+
   def findAsset(file: String): String = {
-    val root = Paths.get("target").resolve("site")
-    val path = root.resolve("assets").resolve(file)
-    val dir = path.getParent
-    val candidates = Files.list(dir).iterator().asScala.toList
-    val lastSlash = file.lastIndexOf("/")
-    val nameStart = if (lastSlash == -1) 0 else lastSlash + 1
-    val name = file.substring(nameStart)
-    val dotIdx = name.lastIndexOf(".")
-    val noExt = name.substring(0, dotIdx)
-    val ext = name.substring(dotIdx + 1)
-    val result = candidates.filter { p =>
-      val candidateName = p.getFileName.toString
-      candidateName.startsWith(noExt) && candidateName.endsWith(ext)
-    }.sortBy { p =>
-      Files.getLastModifiedTime(p)
-    }.reverse.headOption
-    val found = result.getOrElse(
-      fail(s"Not found: '$file'. Found ${candidates.mkString(", ")}.")
-    )
-    root.relativize(found).toString.replace("\\", "/")
+    HashedAssets.assets.get(file).map(p => s"/$p").getOrElse(fail(s"Not found: '$file'."))
   }
 
   def fail(message: String) = throw new Exception(message)

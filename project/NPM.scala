@@ -29,10 +29,13 @@ object NPM {
   def canonical(command: String) = s"$cmdPrefix$command"
 }
 
-/** Try https://stackoverflow.com/questions/269494/how-can-i-cause-a-child-process-to-exit-when-the-parent-does
+/** Try
+  * https://stackoverflow.com/questions/269494/how-can-i-cause-a-child-process-to-exit-when-the-parent-does
   *
-  * @see https://torre.me.uk/2019/03/06/scala-play-rest-and-angular/
-  * @see https://gist.github.com/jroper/387b05830044d006eb231abd1bc768e5
+  * @see
+  *   https://torre.me.uk/2019/03/06/scala-play-rest-and-angular/
+  * @see
+  *   https://gist.github.com/jroper/387b05830044d006eb231abd1bc768e5
   */
 class NPM(base: File, target: File, log: Logger) {
   private var watchProcess: Option[Process] = None
