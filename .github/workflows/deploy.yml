@@ -28,4 +28,4 @@ jobs:
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: sbt "set scalaJSStage in Global := FullOptStage" deploy
+        run: sbt "set scalaJSStage in Global := FullOptStage" "set Global / mode := com.malliina.build.Mode.Prod" deploy

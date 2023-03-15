@@ -3,7 +3,7 @@ import commonjs from "@rollup/plugin-commonjs"
 import terser from "@rollup/plugin-terser"
 import typescript from "@rollup/plugin-typescript"
 import url from "@rollup/plugin-url"
-// import {scalajs, production, outputDir} from "./target/scalajs.rollup.config.js"
+import {production, outputDir} from "./target/scalajs.rollup.config.js"
 import path from "path"
 import extractcss from "./rollup-extract-css"
 import type {RollupOptions} from "rollup"
@@ -31,6 +31,10 @@ const appUrlOptions = [
     url: "inline"
   },
   {
+    filter: "**/*.woff",
+    url: "inline"
+  },
+  {
     filter: "**/*.svg",
     url: "inline"
   },
@@ -38,8 +42,6 @@ const appUrlOptions = [
 ]
 
 const entryNames = "[name].js"
-const production = false
-const outputDir = "target/assets"
 
 const css = (options) => extractcss({
   outDir: outputDir,

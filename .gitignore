@@ -12,3 +12,6 @@ dist/
 node_modules
 state.json
 .bsp
+
+# Local Netlify folder
+.netlify
