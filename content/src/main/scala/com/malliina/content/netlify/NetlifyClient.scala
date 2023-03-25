@@ -46,8 +46,10 @@ class NetlifyClient {
   def cached(dir: Path): Seq[WebsiteFile] = {
     Files.walk(dir).iterator().asScala.toList.map { p =>
       val relative = dir.relativize(p)
+      val noCacheExts = Seq("map", "md5")
+      val noCache = noCacheExts.exists(ext => relative.toString.endsWith(ext))
       val cache =
-        if (relative.startsWith(Paths.get("assets"))) CacheControls.eternalCache
+        if ((relative.toString.count(_ == '.') >= 2) && !noCache) CacheControls.eternalCache
         else CacheControls.defaultCacheControl
       WebsiteFile(relative, cache)
     }

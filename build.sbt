@@ -51,13 +51,13 @@ val content = project
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     crossScalaVersions := scala213 :: scala212 :: Nil,
     scalaVersion := scala212,
-    libraryDependencies ++= Seq(
+    libraryDependencies ++= Seq("classic", "core").map { m =>
+      "ch.qos.logback" % s"logback-$m" % "1.4.5"
+    } ++ Seq(
       "com.malliina" %% "primitives" % "3.4.0",
       "com.lihaoyi" %% "scalatags" % "0.12.0",
       "com.typesafe" % "config" % "1.4.2",
-      "com.vladsch.flexmark" % "flexmark" % "0.64.0",
-      "ch.qos.logback" % "logback-classic" % "1.4.5",
-      "ch.qos.logback" % "logback-core" % "1.4.5"
+      "com.vladsch.flexmark" % "flexmark" % "0.64.0"
     ),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
     build := build.dependsOn((docs / mdoc).toTask("")).value,
