@@ -3,7 +3,7 @@ package com.malliina.content
 import com.malliina.content.Pages._
 import com.malliina.http.FullUrl
 import com.malliina.live.LiveReload
-import com.malliina.sitegen.HashedAssets
+import com.malliina.assets.HashedAssets
 import scalatags.Text.all._
 import scalatags.text.Builder
 
