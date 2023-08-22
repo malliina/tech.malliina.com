@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "target": "ES5",
-    "lib": ["ES7"],
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
-  }
-}

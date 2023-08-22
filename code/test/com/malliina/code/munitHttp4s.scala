@@ -17,8 +17,8 @@ case class DatabaseConf(url: String, user: String, pass: String)
 
 class DatabaseService(database: HikariTransactor[IO]) extends Http4sDsl[IO] {
   val routes = HttpRoutes
-    .of[IO] {
-      case GET -> Root / "ping" => Ok("pong")
+    .of[IO] { case GET -> Root / "ping" =>
+      Ok("pong")
     }
     .orNotFound
 }
@@ -72,7 +72,7 @@ trait DatabaseSuite { self: Suite =>
     }
   }
 
-  override def munitFixtures: Seq[Fixture[_]] = Seq(db)
+  override def munitFixtures: Seq[Fixture[?]] = Seq(db)
 }
 
 trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
@@ -86,10 +86,9 @@ trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
       val resource = DatabaseApp.appResource(db())
       val resourceEffect = resource.allocated[DatabaseService]
       val setupEffect =
-        resourceEffect.map {
-          case (t, release) =>
-            promise.success(release)
-            t
+        resourceEffect.map { case (t, release) =>
+          promise.success(release)
+          t
         }.flatTap(t => IO.pure(()))
 
       service = Option(setupEffect.unsafeRunSync())
@@ -100,5 +99,5 @@ trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
     }
   }
 
-  override def munitFixtures: Seq[Fixture[_]] = Seq(db, app)
+  override def munitFixtures: Seq[Fixture[?]] = Seq(db, app)
 }
