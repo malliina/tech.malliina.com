@@ -23,16 +23,3 @@ Navigate to http://localhost:10101/list.html.
 ## Deployments
 
 To deploy to [tech.malliina.com](https://tech.malliina.com) hosted at Netlify, push to the `master` branch.
-
-### Code highlighting
-
-To bundle code highlighting to the main JS file:
-
-1. In a directory outside of this repo:
-
-        git clone https://github.com/highlightjs/highlight.js.git
-        cd highlight.js
-        node tools/build.js -t node scala
-    
-1. Copy *build/lib/core.js* and *build/lib/languages/scala.js* to [frontend/src](frontend/src) and initialize them as in
-[index.ts](frontend/src/index.ts).
