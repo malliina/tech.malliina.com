@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
 val utilsVersion = "1.6.19"
 
 Seq(
-  "com.typesafe.play" % "sbt-plugin" % "2.8.15",
+  "com.typesafe.play" % "sbt-plugin" % "2.8.20",
   "com.malliina" % "sbt-utils-maven" % utilsVersion,
   "com.malliina" % "sbt-nodejs" % utilsVersion,
   "com.malliina" % "sbt-revolver-rollup" % utilsVersion,
