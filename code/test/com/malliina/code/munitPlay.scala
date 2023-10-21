@@ -17,8 +17,8 @@ class PingApp(context: Context = PingApp.createTestAppContext)
   extends BuiltInComponentsFromContext(context) {
 
   override def httpFilters = Nil
-  override def router = Router.from {
-    case GET(p"/ping") => Action(Ok("pong"))
+  override def router = Router.from { case GET(p"/ping") =>
+    Action(Ok("pong"))
   }
 }
 
@@ -99,7 +99,7 @@ class AppTest extends FunSuite with AppPerTest {
 }
 
 class ServerTest extends FunSuite with ServerPerTest {
-  implicit val as = ActorSystem("test")
+  implicit val as: ActorSystem = ActorSystem("test")
   val http = AhcWSClient()
 
   server.test("server responds to ping") { server =>
@@ -124,7 +124,7 @@ class AppTests extends FunSuite with AppPerSuite {
 }
 
 class ServerTests extends FunSuite with ServerPerSuite {
-  implicit val as = ActorSystem("test")
+  implicit val as: ActorSystem = ActorSystem("test")
   val http = AhcWSClient()
 
   test("request to ping address returns 200") {

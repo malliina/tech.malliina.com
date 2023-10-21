@@ -100,9 +100,8 @@ class Pages(local: Boolean) {
 
   def inlineOrAsset(file: String) = HashedAssets.dataUris.getOrElse(file, findAsset(file))
 
-  def findAsset(file: String): String = {
+  def findAsset(file: String): String =
     HashedAssets.assets.get(file).map(p => s"/$p").getOrElse(fail(s"Not found: '$file'."))
-  }
 
   def fail(message: String) = throw new Exception(message)
 }
