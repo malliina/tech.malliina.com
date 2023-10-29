@@ -37,6 +37,9 @@ val docs = project
 val frontend = project
   .in(file("frontend"))
   .enablePlugins(NodeJsPlugin, RollupPlugin)
+  .settings(
+    scalaVersion := scala3
+  )
 
 val content = project
   .in(file("content"))
