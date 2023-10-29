@@ -9,7 +9,7 @@ val code = project
   .in(file("code"))
   .enablePlugins(PlayScala)
   .settings(
-    scalaVersion := scala3,
+    scalaVersion := scala213,
     libraryDependencies ++= Seq("blaze-server", "dsl").map { m =>
       "org.http4s" %% s"http4s-$m" % "0.23.12"
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
@@ -28,7 +28,7 @@ val docs = project
   .dependsOn(code, code % "compile->test")
   .settings(
     organization := "com.malliina",
-    scalaVersion := scala3,
+    scalaVersion := scala213,
     publish / skip := true,
     mdocVariables := Map("NAME" -> name.value, "VERSION" -> version.value),
     mdocOut := (ThisBuild / baseDirectory).value / "target" / "docs"

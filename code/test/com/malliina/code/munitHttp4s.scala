@@ -76,7 +76,7 @@ trait DatabaseSuite { self: Suite =>
 }
 
 trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
-  val app: Fixture[DatabaseService] = new Fixture[DatabaseService]("db-app") {
+  val dbApp: Fixture[DatabaseService] = new Fixture[DatabaseService]("db-app") {
     private var service: Option[DatabaseService] = None
     val promise = Promise[IO[Unit]]()
 
@@ -99,5 +99,5 @@ trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
     }
   }
 
-  override def munitFixtures: Seq[Fixture[?]] = Seq(db, app)
+  override def munitFixtures: Seq[Fixture[?]] = Seq(db, dbApp)
 }

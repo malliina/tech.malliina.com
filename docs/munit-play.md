@@ -55,7 +55,7 @@ Define the following fixture:
 
 ```scala mdoc:silent
 trait PlayAppFixture { self: FunSuite =>
-  val app = FunFixture[PingApp](
+  val playApp = FunFixture[PingApp](
     opts => {
       val comps = new PingApp()
       Play.start(comps.application)
@@ -72,7 +72,7 @@ Then use it as follows:
 
 ```scala mdoc:compile-only
 class TestSuite extends FunSuite with PlayAppFixture {
-  app.test("app responds to ping") { comps =>
+  playApp.test("app responds to ping") { comps =>
     val req = FakeRequest("GET", "/ping")
     val res = await(route(comps.application, req).get)
     assert(res.header.status == 200)
@@ -104,7 +104,7 @@ Use it as follows:
 
 ```scala mdoc:compile-only
 class TestServer extends FunSuite with PlayServerFixture {
-  implicit val as = ActorSystem("test")
+  implicit val as: ActorSystem = ActorSystem("test")
   val http = AhcWSClient()
 
   server.test("server responds to ping") { server =>
@@ -123,7 +123,7 @@ To use the same app in all tests in the suite, define this fixture:
 
 ```scala mdoc:silent
 trait AppPerSuite { self: Suite =>
-  val pingApp = new Fixture[PingApp]("ping-app") {
+  val pingAppFixture = new Fixture[PingApp]("ping-app") {
     private var comps: PingApp = null
     def apply() = comps
     override def beforeAll(): Unit = {
@@ -134,9 +134,9 @@ trait AppPerSuite { self: Suite =>
       Play.stop(comps.application)
     }
   }
-  def app = pingApp().application
+  def pingApp = pingAppFixture().application
 
-  override def munitFixtures = Seq(pingApp)
+  override def munitFixtures = Seq(pingAppFixture)
 }
 ```
 
@@ -146,13 +146,13 @@ Use it as follows:
 class AppTests extends FunSuite with AppPerSuite {
   test("request to ping address returns 200") {
     val req = FakeRequest("GET", "/ping")
-    val res = await(route(app, req).get)
+    val res = await(route(pingApp, req).get)
     assert(res.header.status == 200)
   }
 
   test("request to wrong address returns 404") {
     val req = FakeRequest("GET", "/nonexistent")
-    val res = await(route(app, req).get)
+    val res = await(route(pingApp, req).get)
     assert(res.header.status == 404)
   }
 }
@@ -185,7 +185,7 @@ Then mix in that trait when writing your tests:
 
 ```scala mdoc:compile-only
 class ServerTests extends FunSuite with ServerPerSuite {
-  implicit val as = ActorSystem("test")
+  implicit val as: ActorSystem = ActorSystem("test")
   val http = AhcWSClient()
 
   test("request to ping address returns 200") {

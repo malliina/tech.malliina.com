@@ -57,7 +57,7 @@ trait ServerPerTest { self: FunSuite =>
 }
 
 trait AppPerSuite { self: Suite =>
-  val pingApp: Fixture[PingApp] = new Fixture[PingApp]("ping-app") {
+  val pingAppFixture: Fixture[PingApp] = new Fixture[PingApp]("ping-app") {
     private var comps: PingApp = null
     def apply() = comps
     override def beforeAll(): Unit = {
@@ -68,9 +68,9 @@ trait AppPerSuite { self: Suite =>
       Play.stop(comps.application)
     }
   }
-  def app = pingApp().application
+  def pingApp = pingAppFixture().application
 
-  override def munitFixtures = Seq(pingApp)
+  override def munitFixtures = Seq(pingAppFixture)
 }
 
 trait ServerPerSuite { self: Suite =>
@@ -112,13 +112,13 @@ class ServerTest extends FunSuite with ServerPerTest {
 class AppTests extends FunSuite with AppPerSuite {
   test("request to ping address returns 200") {
     val req = FakeRequest("GET", "/ping")
-    val res = await(route(app, req).get)
+    val res = await(route(pingApp, req).get)
     assert(res.header.status == 200)
   }
 
   test("request to wrong address returns 404") {
     val req = FakeRequest("GET", "/nonexistent")
-    val res = await(route(app, req).get)
+    val res = await(route(pingApp, req).get)
     assert(res.header.status == 404)
   }
 }

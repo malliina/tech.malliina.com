@@ -76,7 +76,7 @@ To share the app instance between all tests in the suite, define this trait:
 
 ```scala mdoc:silent
 trait Http4sSuite { self: Suite =>
-  val app: Fixture[AppServer.Routes] = new Fixture[AppServer.Routes]("app") {
+  val httpApp: Fixture[AppServer.Routes] = new Fixture[AppServer.Routes]("app") {
     private var service: Option[AppServer.Routes] = None
     override def apply(): AppServer.Routes = service.get
     override def beforeAll(): Unit = {
@@ -84,7 +84,7 @@ trait Http4sSuite { self: Suite =>
     }
   }
 
-  override def munitFixtures: Seq[Fixture[_]] = Seq(app)
+  override def munitFixtures: Seq[Fixture[_]] = Seq(httpApp)
 }
 ```
 
@@ -93,7 +93,7 @@ Use it in your test suite:
 ```scala mdoc:silent
 class OneAppPerSuite extends FunSuite with Http4sSuite {
   test("run app") {
-    val routes = app()
+    val routes = httpApp()
     val response = routes.run(Request(uri = uri"/ping")).unsafeRunSync()
     assertEquals(response.status, Status.Ok)
   }
@@ -191,7 +191,7 @@ Now we create a master test suite that starts a database and launches an http4s 
 
 ```scala mdoc:silent
 trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
-  val app: Fixture[DatabaseService] = new Fixture[DatabaseService]("db-app") {
+  val dbApp: Fixture[DatabaseService] = new Fixture[DatabaseService]("db-app") {
     private var service: Option[DatabaseService] = None
     val promise = Promise[IO[Unit]]()
 
@@ -215,7 +215,7 @@ trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
     }
   }
 
-  override def munitFixtures: Seq[Fixture[_]] = Seq(db, app)
+  override def munitFixtures: Seq[Fixture[_]] = Seq(db, dbApp)
 }
 ```
 
@@ -226,7 +226,7 @@ the tests:
 ```scala mdoc:silent
 class DatabaseAppTests extends FunSuite with DatabaseAppSuite {
   test("test app") {
-    val service = app()
+    val service = dbApp()
     val request = Request[IO](uri = uri"/ping")
     val response = service.routes.run(request).unsafeRunSync()
     assertEquals(response.status, Status.Ok)
