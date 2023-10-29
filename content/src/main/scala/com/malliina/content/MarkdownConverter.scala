@@ -9,10 +9,10 @@ import com.vladsch.flexmark.util.data.MutableDataSet
 
 object MarkdownConverter extends MarkdownConverter
 
-class MarkdownConverter {
+class MarkdownConverter:
   val options = new MutableDataSet
   // uncomment to set optional extensions
-  //options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), StrikethroughExtension.create()));
+  // options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), StrikethroughExtension.create()));
   // uncomment to convert soft-breaks to hard breaks
 //  options.set(HtmlRenderer.SOFT_BREAK, "<br />\n");
   val parser = Parser.builder(options).build
@@ -20,9 +20,7 @@ class MarkdownConverter {
 
   def toHtml(file: Path): Html = toHtml(Markdown(fileToString(file)))
 
-  def toHtml(markdown: Markdown): Html = {
+  def toHtml(markdown: Markdown): Html =
     // You can re-use parser and renderer instances
     val document = parser.parse(markdown.content)
     Html(renderer.render(document))
-  }
-}

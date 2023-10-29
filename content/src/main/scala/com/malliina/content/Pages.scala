@@ -1,20 +1,18 @@
 package com.malliina.content
 
-import com.malliina.content.Pages._
+import com.malliina.assets.{FileAssets, HashedAssets}
+import com.malliina.content.Pages.{*, given}
 import com.malliina.http.FullUrl
 import com.malliina.live.LiveReload
-import com.malliina.assets.HashedAssets
-import scalatags.Text.all._
+import scalatags.Text.all.*
 import scalatags.text.Builder
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-object Pages {
-  def apply(local: Boolean): Pages = new Pages(local)
-
+object Pages:
   val domain = FullUrl.https("tech.malliina.com", "")
-  implicit val fullUrl: AttrValue[FullUrl] = attrType[FullUrl](_.url)
+  given AttrValue[FullUrl] = attrType[FullUrl](_.url)
 
   val time = tag("time")
   val titleTag = tag("title")
@@ -24,12 +22,11 @@ object Pages {
 
   def attrType[T](stringify: T => String): AttrValue[T] = (t: Builder, a: Attr, v: T) =>
     t.setAttr(a.name, Builder.GenericAttrValueSource(stringify(v)))
-}
 
-class Pages(local: Boolean) {
+class Pages(local: Boolean):
   val listFile = "list.html"
   val remoteListUri = "list"
-  val listUri = if (local) "list.html" else remoteListUri
+  val listUri = if local then "list.html" else remoteListUri
 
   val globalDescription = "Posts on Scala, programming, and other tech topics."
 
@@ -41,7 +38,7 @@ class Pages(local: Boolean) {
       h1("Posts"),
       ul(
         pages.map { page =>
-          val itemUri = if (local) page.name else page.noExt
+          val itemUri = if local then page.name else page.noExt
           li(`class` := "post-item")(
             a(href := itemUri)(page.title),
             format(page.date, page.updated)
@@ -72,33 +69,31 @@ class Pages(local: Boolean) {
         meta(name := "twitter:card", content := "summary"),
         meta(name := "twitter:site", content := "@kungmalle"),
         meta(name := "twitter:creator", content := "@kungmalle"),
-        meta(name := "og:image", content := (Pages.domain / findAsset("img/jag.jpg"))),
+        meta(name := "og:image", content := (Pages.domain / findAsset(FileAssets.img.jag_jpg))),
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
         link(rel := "canonical", href := url),
         link(
           rel := "shortcut icon",
           `type` := "image/jpeg",
-          href := inlineOrAsset("img/jag.jpg")
+          href := inlineOrAsset(FileAssets.img.jag_jpg)
         ),
-        styleAt("fonts.css"),
-        styleAt("styles.css"),
-        if (local) script(src := LiveReload.script) else modifier()
+        styleAt(FileAssets.fonts_css),
+        styleAt(FileAssets.styles_css),
+        if local then script(src := LiveReload.script) else modifier()
       ),
       body(
-        contents :+ scriptAt("frontend.js", defer)
+        contents :+ scriptAt(FileAssets.frontend_js, defer)
       )
     )
   )
 
-  def format(date: LocalDate, updated: Option[LocalDate]) = {
+  def format(date: LocalDate, updated: Option[LocalDate]) =
     val localDate = DateTimeFormatter.ISO_LOCAL_DATE.format(date)
-    val updateFormatted = updated.fold(modifier()) { upd =>
+    val updateFormatted = updated.fold(modifier()): upd =>
       val updatedStr = DateTimeFormatter.ISO_LOCAL_DATE.format(upd)
       modifier(span(" updated "), time(datetime := updatedStr)(updatedStr))
-    }
     modifier(time(datetime := localDate)(localDate), updateFormatted)
-  }
 
   def styleAt(file: String) =
     link(rel := "stylesheet", href := findAsset(file))
@@ -111,4 +106,3 @@ class Pages(local: Boolean) {
     HashedAssets.assets.get(file).map(p => s"/$p").getOrElse(fail(s"Not found: '$file'."))
 
   def fail(message: String) = throw new Exception(message)
-}
