@@ -1,6 +1,7 @@
 ---
 title: MUnit with http4s
 date: 2021-01-29
+updated: 2023-10-29
 ---
 # MUnit with http4s
 

@@ -37,7 +37,7 @@ object Generator {
       val page = pages.page(post.title, url, html)
       val htmlFile = page.write(out)
       post.meta.map { meta =>
-        MarkdownPage(htmlFile, meta.title, url, meta.date)
+        MarkdownPage(htmlFile, meta.title, url, meta.date, meta.updated)
       }
     }
     val newestFirst = markdownPages.sortBy(_.date.toEpochDay).reverse

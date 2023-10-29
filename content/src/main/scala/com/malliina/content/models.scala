@@ -21,7 +21,7 @@ object Html {
 
 case class Markdown(content: String) extends AnyVal
 
-case class PostMeta(title: String, date: LocalDate, updated: LocalDate)
+case class PostMeta(title: String, date: LocalDate, updated: Option[LocalDate])
 
 case class MarkdownPost(content: Markdown, meta: Option[PostMeta]) {
   def title = meta.map(_.title).getOrElse("Tech")
@@ -43,13 +43,19 @@ object MarkdownPost {
     val meta = for {
       title <- get("title")
       date <- get("date").map(d => LocalDate.parse(d))
-      updated = get("updated").map(u => LocalDate.parse(u)).getOrElse(date)
+      updated = get("updated").map(u => LocalDate.parse(u))
     } yield PostMeta(title, date, updated)
     MarkdownPost(Markdown(content.mkString("\n")), meta)
   }
 }
 
-case class MarkdownPage(file: Path, title: String, url: FullUrl, date: LocalDate) {
+case class MarkdownPage(
+  file: Path,
+  title: String,
+  url: FullUrl,
+  date: LocalDate,
+  updated: Option[LocalDate]
+) {
   val name = file.getFileName.toString
   val dotIdx = name.lastIndexOf(".")
   val noExt = if (dotIdx == -1) name else name.substring(0, dotIdx)

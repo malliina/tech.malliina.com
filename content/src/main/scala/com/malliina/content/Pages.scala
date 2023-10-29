@@ -42,7 +42,10 @@ class Pages(local: Boolean) {
       ul(
         pages.map { page =>
           val itemUri = if (local) page.name else page.noExt
-          li(`class` := "post-item")(a(href := itemUri)(page.title), format(page.date))
+          li(`class` := "post-item")(
+            a(href := itemUri)(page.title),
+            format(page.date, page.updated)
+          )
         }
       )
     ),
@@ -88,9 +91,13 @@ class Pages(local: Boolean) {
     )
   )
 
-  def format(date: LocalDate) = {
+  def format(date: LocalDate, updated: Option[LocalDate]) = {
     val localDate = DateTimeFormatter.ISO_LOCAL_DATE.format(date)
-    time(datetime := localDate)(localDate)
+    val updateFormatted = updated.fold(modifier()) { upd =>
+      val updatedStr = DateTimeFormatter.ISO_LOCAL_DATE.format(upd)
+      modifier(span(" updated "), time(datetime := updatedStr)(updatedStr))
+    }
+    modifier(time(datetime := localDate)(localDate), updateFormatted)
   }
 
   def styleAt(file: String) =
