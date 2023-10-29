@@ -3,7 +3,7 @@ scalaVersion := "2.12.16"
 val utilsVersion = "1.6.28"
 
 Seq(
-  "com.typesafe.play" % "sbt-plugin" % "2.8.20",
+  "com.typesafe.play" % "sbt-plugin" % "2.9.0",
   "com.malliina" % "sbt-utils-maven" % utilsVersion,
   "com.malliina" % "sbt-nodejs" % utilsVersion,
   "com.malliina" % "sbt-revolver-rollup" % utilsVersion,
