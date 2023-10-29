@@ -1,6 +1,5 @@
 import play.sbt.PlayImport
 
-val scala212 = "2.12.18"
 val scala213 = "2.13.12"
 val scala3 = "3.3.1"
 
@@ -8,17 +7,15 @@ val frontendDirectory = settingKey[File]("frontend base dir")
 ThisBuild / frontendDirectory := baseDirectory.value / "frontend"
 val docsDir = settingKey[File]("Docs target dir")
 
-val http4sModules = Seq("blaze-server", "dsl")
-
 val code = project
   .in(file("code"))
   .enablePlugins(PlayScala)
   .settings(
     scalaVersion := scala213,
-    libraryDependencies ++= http4sModules.map { m =>
+    libraryDependencies ++= Seq("blaze-server", "dsl").map { m =>
       "org.http4s" %% s"http4s-$m" % "0.23.12"
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
-      "org.tpolecat" %% d % "1.0.0-RC2"
+      "org.tpolecat" %% d % "1.0.0-RC4"
     } ++ Seq(
       PlayImport.ws,
       "com.dimafeng" %% "testcontainers-scala-mysql" % "0.40.12" % Test,
@@ -49,12 +46,11 @@ val content = project
   .settings(
     scalajsProject := frontend,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
-    crossScalaVersions := scala213 :: scala212 :: Nil,
-    scalaVersion := scala212,
+    scalaVersion := scala3,
     libraryDependencies ++= Seq("classic", "core").map { m =>
       "ch.qos.logback" % s"logback-$m" % "1.4.11"
     } ++ Seq(
-      "com.malliina" %% "primitives" % "3.4.5",
+      "com.malliina" %% "primitives" % "3.4.6",
       "com.lihaoyi" %% "scalatags" % "0.12.0",
       "com.typesafe" % "config" % "1.4.3",
       "com.vladsch.flexmark" % "flexmark" % "0.64.8"
