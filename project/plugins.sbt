@@ -1,10 +1,5 @@
 scalaVersion := "2.12.16"
 
-libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-json" % "2.9.4",
-  "com.malliina" %% "primitives" % "3.4.6"
-)
-
 val utilsVersion = "1.6.28"
 
 Seq(

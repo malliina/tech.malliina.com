@@ -3,8 +3,6 @@ import play.sbt.PlayImport
 val scala213 = "2.13.12"
 val scala3 = "3.3.1"
 
-val frontendDirectory = settingKey[File]("frontend base dir")
-ThisBuild / frontendDirectory := baseDirectory.value / "frontend"
 val docsDir = settingKey[File]("Docs target dir")
 
 val code = project
