@@ -34,6 +34,18 @@ val docs = project
     mdocOut := (ThisBuild / baseDirectory).value / "target" / "docs"
   )
 
+val docs3 = project
+  .in(file("mdoc3"))
+  .enablePlugins(MdocPlugin)
+  .settings(
+    organization := "com.malliina",
+    scalaVersion := scala3,
+    publish / skip := true,
+    mdocVariables := Map("NAME" -> name.value, "VERSION" -> version.value),
+    mdocIn := (ThisBuild / baseDirectory).value / "docs-scala3",
+    mdocOut := (ThisBuild / baseDirectory).value / "target" / "docs"
+  )
+
 val frontend = project
   .in(file("frontend"))
   .enablePlugins(NodeJsPlugin, RollupPlugin)
@@ -57,7 +69,7 @@ val content = project
       "com.vladsch.flexmark" % "flexmark" % "0.64.8"
     ),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
-    build := build.dependsOn((docs / mdoc).toTask("")).value,
+    build := build.dependsOn((docs / mdoc).toTask(""), (docs3 / mdoc).toTask("")).value,
     buildInfoKeys ++= Seq[BuildInfoKey](
       "docsDir" -> docsDir.value
     )

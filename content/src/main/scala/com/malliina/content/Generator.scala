@@ -35,6 +35,7 @@ object Generator:
       val url = domain / noExt
       val page = pages.page(post.title, url, html)
       val htmlFile = page.write(out)
+      // Pages without a meta section will be included in the site but excluded from the list of pages
       post.meta.map: meta =>
         MarkdownPage(htmlFile, meta.title, url, meta.date, meta.updated)
     val newestFirst = markdownPages.sortBy(_.date.toEpochDay).reverse
