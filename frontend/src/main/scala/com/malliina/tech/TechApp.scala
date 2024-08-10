@@ -5,6 +5,7 @@ import scala.scalajs.js.annotation.JSImport
 
 object TechApp:
   def main(args: Array[String]): Unit =
+    println("Hej")
     hljs.registerLanguage("scala", hljsScala)
     hljs.highlightAll()
 

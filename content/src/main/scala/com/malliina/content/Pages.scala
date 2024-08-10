@@ -28,6 +28,10 @@ class Pages(local: Boolean):
   val remoteListUri = "list"
   val listUri = if local then "list.html" else remoteListUri
 
+  val scripts =
+    if local then Seq(FileAssets.frontend_js, FileAssets.frontend_loader_js, FileAssets.main_js)
+    else Seq(FileAssets.frontend_js)
+
   val globalDescription = "Posts on Scala, programming, and other tech topics."
 
   def page(title: String, url: FullUrl, content: Html): TagPage =
@@ -83,7 +87,7 @@ class Pages(local: Boolean):
         if local then script(src := LiveReload.script) else modifier()
       ),
       body(
-        contents :+ scriptAt(FileAssets.frontend_js, defer)
+        contents ++ scripts.map(file => scriptAt(file, defer))
       )
     )
   )

@@ -1,7 +1,7 @@
 import play.sbt.PlayImport
 
-val scala213 = "2.13.12"
-val scala3 = "3.3.1"
+val scala213 = "2.13.14"
+val scala3 = "3.4.2"
 
 val docsDir = settingKey[File]("Docs target dir")
 
@@ -10,14 +10,14 @@ val code = project
   .enablePlugins(PlayScala)
   .settings(
     scalaVersion := scala213,
-    libraryDependencies ++= Seq("blaze-server", "dsl").map { m =>
-      "org.http4s" %% s"http4s-$m" % "0.23.12"
+    libraryDependencies ++= Seq("ember-server", "dsl").map { m =>
+      "org.http4s" %% s"http4s-$m" % "0.23.27"
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
-      "org.tpolecat" %% d % "1.0.0-RC4"
+      "org.tpolecat" %% d % "1.0.0-RC5"
     } ++ Seq(
       PlayImport.ws,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.40.12" % Test,
-      "org.scalameta" %% "munit" % "0.7.29" % Test
+      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.41.4" % Test,
+      "org.scalameta" %% "munit" % "1.0.0" % Test
     ),
     testFrameworks += new TestFramework("munit.Framework")
   )
@@ -60,11 +60,10 @@ val content = project
     scalajsProject := frontend,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     scalaVersion := scala3,
-    libraryDependencies ++= Seq("classic", "core").map { m =>
-      "ch.qos.logback" % s"logback-$m" % "1.4.11"
-    } ++ Seq(
-      "com.malliina" %% "primitives" % "3.4.6",
-      "com.lihaoyi" %% "scalatags" % "0.12.0",
+    libraryDependencies ++= Seq(
+      "ch.qos.logback" % "logback-classic" % "1.5.6",
+      "com.malliina" %% "primitives" % "3.7.3",
+      "com.lihaoyi" %% "scalatags" % "0.13.1",
       "com.typesafe" % "config" % "1.4.3",
       "com.vladsch.flexmark" % "flexmark" % "0.64.8"
     ),

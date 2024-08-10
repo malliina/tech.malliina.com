@@ -2,16 +2,18 @@ package com.malliina.code
 
 import cats.effect.unsafe.implicits.global
 import cats.effect.{ExitCode, IO, IOApp, Resource}
+import com.comcast.ip4s.IpLiteralSyntax
 import com.dimafeng.testcontainers.MySQLContainer
 import doobie.hikari.HikariTransactor
 import doobie.util.ExecutionContexts
 import munit.Suite
 import org.http4s.HttpRoutes
-import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.dsl.Http4sDsl
+import org.http4s.ember.server.EmberServerBuilder
 import org.testcontainers.utility.DockerImageName
 
 import scala.concurrent.Promise
+import scala.concurrent.duration.DurationInt
 
 case class DatabaseConf(url: String, user: String, pass: String)
 
@@ -38,10 +40,13 @@ object DatabaseApp extends IOApp {
 
   def buildServer(conf: DatabaseConf) = for {
     app <- appResource(conf)
-    server <- BlazeServerBuilder[IO]
-      .bindHttp(port = 9000, "0.0.0.0")
+    server <- EmberServerBuilder
+      .default[IO]
+      .withHost(host"0.0.0.0")
+      .withPort(port"9000")
       .withHttpApp(app.routes)
-      .resource
+      .withShutdownTimeout(1.millis)
+      .build
   } yield server
 
   override def run(args: List[String]): IO[ExitCode] =

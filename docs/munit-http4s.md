@@ -1,7 +1,7 @@
 ---
 title: MUnit with http4s
 date: 2021-01-29
-updated: 2023-10-29
+updated: 2024-08-10
 ---
 # MUnit with http4s
 
@@ -13,18 +13,21 @@ to write integration tests for http4s web services using MUnit.
 import cats.data.Kleisli
 import cats.effect.unsafe.implicits.global
 import cats.effect.{ExitCode, IO, IOApp, Resource}
+import com.comcast.ip4s.IpLiteralSyntax
 import cats.syntax.flatMap._
 import com.dimafeng.testcontainers.MySQLContainer
 import doobie.hikari._
 import doobie.util.ExecutionContexts
 import munit.{FunSuite, Suite}
+import org.http4s.ember.server.EmberServerBuilder
 import org.testcontainers.utility.DockerImageName
 import org.http4s._
 import org.http4s.implicits._
 import org.http4s.dsl.Http4sDsl
 import org.http4s.server.Router
-import org.http4s.blaze.server.BlazeServerBuilder
+import org.http4s.ember.server.EmberServerBuilder
 import scala.concurrent.{ExecutionContext, Promise}
+import scala.concurrent.duration.DurationInt
 ```
 
 ## The app
@@ -41,11 +44,14 @@ class AppService extends Http4sDsl[IO] {
 object AppServer extends IOApp {
   type Routes = Kleisli[IO, Request[IO], Response[IO]]
   val app: Routes = new AppService().routes
-  val server = BlazeServerBuilder[IO]
-    .bindHttp(port = 9000, "0.0.0.0")
+  val server = EmberServerBuilder
+    .default[IO]
+    .withHost(host"0.0.0.0")
+    .withPort(port"9000")
     .withHttpApp(app)
+    .build
   override def run(args: List[String]): IO[ExitCode] = 
-    server.serve.compile.drain.as(ExitCode.Success)
+    server.use(_ => IO.never).as(ExitCode.Success)
 }
 ```
 
@@ -140,10 +146,13 @@ object DatabaseApp extends IOApp {
 
   def buildServer(conf: DatabaseConf) = for {
     app <- appResource(conf)
-    server <- BlazeServerBuilder[IO]
-      .bindHttp(port = 9000, "0.0.0.0")
+    server <- EmberServerBuilder
+      .default[IO]
+      .withHost(host"0.0.0.0")
+      .withPort(port"9000")
       .withHttpApp(app.routes)
-      .resource
+      .withShutdownTimeout(1.millis)
+      .build
   } yield server
 
   override def run(args: List[String]): IO[ExitCode] =
