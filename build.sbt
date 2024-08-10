@@ -1,4 +1,5 @@
 import play.sbt.PlayImport
+import java.nio.file.Path
 
 val scala213 = "2.13.14"
 val scala3 = "3.4.2"
@@ -62,6 +63,8 @@ val frontend = project
     scalaVersion := scala3
   )
 
+val watchMarkdown = taskKey[Seq[Path]]("Lists files.")
+
 val content = project
   .in(file("content"))
   .enablePlugins(NetlifyPlugin)
@@ -78,9 +81,16 @@ val content = project
     ),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
     build := build.dependsOn((docs / mdoc).toTask(""), (docs3 / mdoc).toTask("")).value,
+    build / fileInputs ++= Seq((docs3 / mdocIn).value, (docs / mdocIn).value)
+      .map(d => d.toGlob / "*.md"),
     buildInfoKeys ++= Seq[BuildInfoKey](
       "docsDir" -> docsDir.value
-    )
+    ),
+    watchMarkdown / fileInputs += (docs3 / mdocIn).value.toGlob / "*.md",
+    watchMarkdown := {
+      watchMarkdown.inputFiles
+    },
+    build := build.triggeredBy(watchMarkdown).value
   )
 
 val blog = project
