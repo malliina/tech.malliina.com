@@ -18,8 +18,16 @@ val code = project
       PlayImport.ws,
       "com.dimafeng" %% "testcontainers-scala-mysql" % "0.41.4" % Test,
       "org.scalameta" %% "munit" % "1.0.0" % Test
-    ),
-    testFrameworks += new TestFramework("munit.Framework")
+    )
+  )
+
+val code3 = project
+  .in(file("code3"))
+  .settings(
+    scalaVersion := scala213,
+    libraryDependencies ++= Seq(
+      "ch.qos.logback" % "logback-classic" % "1.5.6"
+    )
   )
 
 val docs = project
@@ -37,6 +45,7 @@ val docs = project
 val docs3 = project
   .in(file("mdoc3"))
   .enablePlugins(MdocPlugin)
+  .dependsOn(code3)
   .settings(
     organization := "com.malliina",
     scalaVersion := scala3,

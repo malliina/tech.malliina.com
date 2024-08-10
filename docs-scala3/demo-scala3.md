@@ -6,7 +6,6 @@ Hi, @NAME@! This is version @VERSION@.
 
 ```scala mdoc:invisible
 import java.nio.file.Paths
-import scala.concurrent.Future
 ```
 
 Here's some code:
