@@ -19,7 +19,7 @@ object Html:
 
 case class Markdown(content: String) extends AnyVal
 
-case class PostMeta(title: String, date: LocalDate, updated: Option[LocalDate])
+case class PostMeta(title: String, cls: Option[String], date: LocalDate, updated: Option[LocalDate])
 
 case class MarkdownPost(content: Markdown, meta: Option[PostMeta]):
   def title = meta.map(_.title).getOrElse("Tech")
@@ -38,7 +38,7 @@ object MarkdownPost:
       title <- get("title")
       date <- get("date").map(d => LocalDate.parse(d))
       updated = get("updated").map(u => LocalDate.parse(u))
-    yield PostMeta(title, date, updated)
+    yield PostMeta(title, get("cls"), date, updated)
     MarkdownPost(Markdown(content.mkString("\n")), meta)
 
 case class MarkdownPage(

@@ -33,7 +33,7 @@ object Generator:
       val noExt = markdownFile.getFileName.toString.dropRight(ext.length)
       val out = distDir.resolve(s"$noExt.html")
       val url = domain / noExt
-      val page = pages.page(post.title, url, html)
+      val page = pages.page(post.title, post.meta.flatMap(_.cls), url, html)
       val htmlFile = page.write(out)
       // Pages without a meta section will be included in the site but excluded from the list of pages
       post.meta.map: meta =>

@@ -34,8 +34,12 @@ class Pages(local: Boolean):
 
   val globalDescription = "Posts on Scala, programming, and other tech topics."
 
-  def page(title: String, url: FullUrl, content: Html): TagPage =
-    index(title, url)(div(`class` := "content")(content), footer(a(href := listUri)("Archive")))
+  def page(title: String, cls: Option[String], url: FullUrl, content: Html): TagPage =
+    val classes = Seq("content") ++ cls.toList
+    index(title, url)(
+      div(`class` := classes.mkString(" "))(content),
+      footer(a(href := listUri)("Archive"))
+    )
 
   def list(title: String, url: FullUrl, pages: Seq[MarkdownPage]) = index(title, url)(
     div(`class` := "content")(

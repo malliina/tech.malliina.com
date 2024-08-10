@@ -1,5 +1,6 @@
 ---
 title: Logback programmatically
+cls: logback
 date: 2024-08-10
 ---
 # Logback programmatically
