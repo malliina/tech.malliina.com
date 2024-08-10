@@ -5,7 +5,8 @@ date: 2024-08-10
 ---
 # Logback programmatically
 
-[Logback](https://logback.qos.ch/manual/index.html) is a logging library for the JVM. It is conventional to [configure]((https://logback.qos.ch/manual/configuration.html))
+[Logback](https://logback.qos.ch/manual/index.html "Logback website") is a logging library for the JVM. It is 
+conventional to [configure](https://logback.qos.ch/manual/configuration.html "Logback configuration")
 logback using *logback.xml* configuration files. However, logback can also be configured programmatically. Here
 are some benefits of doing so:
 
