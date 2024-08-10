@@ -53,7 +53,7 @@ ul {
 
 .logback {
   ul {
-    list-style-type: circle;
+    list-style-type: disc;
     list-style-position: inside;
   }
 
