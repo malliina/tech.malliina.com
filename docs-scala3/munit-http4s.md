@@ -1,7 +1,7 @@
 ---
 title: MUnit with http4s
 date: 2021-01-29
-updated: 2024-08-10
+updated: 2024-08-19
 ---
 # MUnit with http4s
 
@@ -13,7 +13,7 @@ to write integration tests for http4s web services using MUnit.
 import cats.data.Kleisli
 import cats.effect.unsafe.implicits.global
 import cats.effect.{ExitCode, IO, IOApp, Resource}
-import com.comcast.ip4s.IpLiteralSyntax
+import com.comcast.ip4s.{host, port}
 import cats.syntax.flatMap._
 import com.dimafeng.testcontainers.MySQLContainer
 import doobie.hikari._
@@ -35,15 +35,14 @@ import scala.concurrent.duration.DurationInt
 Consider the following http4s web service:
 
 ```scala mdoc:silent
-class AppService extends Http4sDsl[IO] {
-  val routes = HttpRoutes.of[IO] {
+class AppService extends Http4sDsl[IO]:
+  val routes = HttpRoutes.of[IO]:
     case GET -> Root / "ping" => Ok("pong")
-  }.orNotFound
-}
+  .orNotFound
 
-object AppServer extends IOApp {
+object AppServer extends IOApp:
   type Routes = Kleisli[IO, Request[IO], Response[IO]]
-  val app: Routes = new AppService().routes
+  val app: Routes = AppService().routes
   val server = EmberServerBuilder
     .default[IO]
     .withHost(host"0.0.0.0")
@@ -52,7 +51,6 @@ object AppServer extends IOApp {
     .build
   override def run(args: List[String]): IO[ExitCode] = 
     server.use(_ => IO.never).as(ExitCode.Success)
-}
 ```
 
 ## One app per test case
@@ -60,21 +58,17 @@ object AppServer extends IOApp {
 We can test this minimal app in a MUnit test suite as follows:
 
 ```scala mdoc:silent
-class AppServiceTests extends FunSuite {
+class AppServiceTests extends FunSuite:
   val app = FunFixture[AppServer.Routes](
-    setup = { test =>
-      AppServer.app
-    },
-    teardown = { file =>
+    setup = test => AppServer.app,
+    teardown = appl =>
       // Always gets called, even if test failed.
-    }
+      ()
   )
   
-  app.test("ping app") { routes =>
+  app.test("ping app"): routes =>
     val response = routes.run(Request(uri = uri"/ping")).unsafeRunSync()
     assertEquals(response.status, Status.Ok)
-  }
-}
 ```
 
 ## One app per suite
@@ -82,29 +76,25 @@ class AppServiceTests extends FunSuite {
 To share the app instance between all tests in the suite, define this trait:
 
 ```scala mdoc:silent
-trait Http4sSuite { self: Suite =>
-  val httpApp: Fixture[AppServer.Routes] = new Fixture[AppServer.Routes]("app") {
+trait Http4sSuite:
+  self: Suite =>
+  val httpApp: Fixture[AppServer.Routes] = new Fixture[AppServer.Routes]("app"):
     private var service: Option[AppServer.Routes] = None
     override def apply(): AppServer.Routes = service.get
-    override def beforeAll(): Unit = {
+    override def beforeAll(): Unit =
       service = Option(AppServer.app)
-    }
-  }
 
-  override def munitFixtures: Seq[Fixture[_]] = Seq(httpApp)
-}
+  override def munitFixtures: Seq[Fixture[?]] = Seq(httpApp)
 ```
 
 Use it in your test suite:
 
 ```scala mdoc:silent
-class OneAppPerSuite extends FunSuite with Http4sSuite {
-  test("run app") {
+class OneAppPerSuite extends FunSuite with Http4sSuite:
+  test("run app"):
     val routes = httpApp()
     val response = routes.run(Request(uri = uri"/ping")).unsafeRunSync()
     assertEquals(response.status, Status.Ok)
-  }
-}
 ```
 
 ## Adding a database
@@ -123,17 +113,15 @@ First, our app that uses a database now looks like this:
 ```scala mdoc:silent
 case class DatabaseConf(url: String, user: String, pass: String)
 
-class DatabaseService(database: HikariTransactor[IO]) extends Http4sDsl[IO] {
+class DatabaseService(database: HikariTransactor[IO]) extends Http4sDsl[IO]:
   val routes = HttpRoutes
-    .of[IO] {
+    .of[IO]:
       case GET -> Root / "ping" => Ok("pong")
-    }
     .orNotFound
-}
 
-object DatabaseApp extends IOApp {
+object DatabaseApp extends IOApp:
   def appResource(conf: DatabaseConf): Resource[IO, DatabaseService] =
-    for {
+    for
       ce <- ExecutionContexts.fixedThreadPool[IO](32)
       transactor <- HikariTransactor.newHikariTransactor[IO](
         "com.mysql.jdbc.Driver",
@@ -142,25 +130,24 @@ object DatabaseApp extends IOApp {
         conf.pass,
         ce
       )
-    } yield new DatabaseService(transactor)
+    yield DatabaseService(transactor)
 
-  def buildServer(conf: DatabaseConf) = for {
-    app <- appResource(conf)
-    server <- EmberServerBuilder
-      .default[IO]
-      .withHost(host"0.0.0.0")
-      .withPort(port"9000")
-      .withHttpApp(app.routes)
-      .withShutdownTimeout(1.millis)
-      .build
-  } yield server
+  def buildServer(conf: DatabaseConf) = 
+    for
+      app <- appResource(conf)
+      server <- EmberServerBuilder
+        .default[IO]
+        .withHost(host"0.0.0.0")
+        .withPort(port"9000")
+        .withHttpApp(app.routes)
+        .withShutdownTimeout(1.millis)
+        .build
+    yield server
 
   override def run(args: List[String]): IO[ExitCode] =
     buildServer(readConf).use(_ => IO.never).as(ExitCode.Success)
 
   def readConf: DatabaseConf = ???
-}
-
 ```
 
 (You might read the database configuration from environment variables in a production setting, but I leave that up to you.)
@@ -171,12 +158,15 @@ following MUnit suite utilizes [Docker](https://www.docker.com/ "Docker website"
 for all tests in your suite:
 
 ```scala mdoc:silent
-trait DatabaseSuite { self: Suite =>
-  val db: Fixture[DatabaseConf] = new Fixture[DatabaseConf]("database") {
+trait DatabaseSuite:
+  self: Suite =>
+  val db: Fixture[DatabaseConf] = new Fixture[DatabaseConf]("database"):
     var container: Option[MySQLContainer] = None
     var conf: Option[DatabaseConf] = None
+
     def apply(): DatabaseConf = conf.get
-    override def beforeAll(): Unit = {
+
+    override def beforeAll(): Unit =
       val image = DockerImageName.parse("mysql:5.7.29")
       val cont = MySQLContainer(mysqlImageVersion = image)
       cont.start()
@@ -187,46 +177,40 @@ trait DatabaseSuite { self: Suite =>
         cont.password
       )
       conf = Option(databaseConf)
-    }
-    override def afterAll(): Unit = {
-      container.foreach(_.stop())
-    }
-  }
 
-  override def munitFixtures: Seq[Fixture[_]] = Seq(db)
-}
+    override def afterAll(): Unit =
+      container.foreach(_.stop())
+
+  override def munitFixtures: Seq[Fixture[?]] = Seq(db)
 ```
 
 Now we create a master test suite that starts a database and launches an http4s service that uses the database:
 
 ```scala mdoc:silent
-trait DatabaseAppSuite extends DatabaseSuite { self: Suite =>
-  val dbApp: Fixture[DatabaseService] = new Fixture[DatabaseService]("db-app") {
+trait DatabaseAppSuite extends DatabaseSuite: 
+  self: Suite =>
+  val dbApp: Fixture[DatabaseService] = new Fixture[DatabaseService]("db-app"):
     private var service: Option[DatabaseService] = None
     val promise = Promise[IO[Unit]]()
 
     override def apply(): DatabaseService = service.get
 
-    override def beforeAll(): Unit = {
+    override def beforeAll(): Unit =
       val resource = DatabaseApp.appResource(db())
       val resourceEffect = resource.allocated[DatabaseService]
       val setupEffect =
-        resourceEffect.map {
+        resourceEffect.map:
           case (t, release) =>
             promise.success(release)
             t
-        }.flatTap(t => IO.pure(()))
+        .flatTap(t => IO.pure(()))
 
       service = Option(setupEffect.unsafeRunSync())
-    }
 
-    override def afterAll(): Unit = {
+    override def afterAll(): Unit =
       IO.fromFuture(IO(promise.future)).flatten.unsafeRunSync()
-    }
-  }
 
-  override def munitFixtures: Seq[Fixture[_]] = Seq(db, dbApp)
-}
+  override def munitFixtures: Seq[Fixture[?]] = Seq(db, dbApp)
 ```
 
 Note that the fixtures are initialized in the order listed in `munitFixtures`. You want your database to be available 
@@ -234,14 +218,12 @@ when your application starts, therefore the database fixture must precede the ap
 the tests:
 
 ```scala mdoc:silent
-class DatabaseAppTests extends FunSuite with DatabaseAppSuite {
-  test("test app") {
+class DatabaseAppTests extends FunSuite with DatabaseAppSuite:
+  test("test app"):
     val service = dbApp()
     val request = Request[IO](uri = uri"/ping")
     val response = service.routes.run(request).unsafeRunSync()
     assertEquals(response.status, Status.Ok)
-  }
-}
 ```
 
 The code for this post is available on [GitHub](https://github.com/malliina/tech.malliina.com).

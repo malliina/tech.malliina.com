@@ -3,6 +3,7 @@ import java.nio.file.Path
 
 val scala213 = "2.13.14"
 val scala3 = "3.4.2"
+val logbackVersion = "1.5.7"
 
 val docsDir = settingKey[File]("Docs target dir")
 
@@ -18,16 +19,22 @@ val code = project
     } ++ Seq(
       PlayImport.ws,
       "com.dimafeng" %% "testcontainers-scala-mysql" % "0.41.4" % Test,
-      "org.scalameta" %% "munit" % "1.0.0" % Test
+      "org.scalameta" %% "munit" % "1.0.1" % Test
     )
   )
 
 val code3 = project
   .in(file("code3"))
   .settings(
-    scalaVersion := scala213,
-    libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.5.6"
+    scalaVersion := scala3,
+    libraryDependencies ++= Seq("ember-server", "dsl").map { m =>
+      "org.http4s" %% s"http4s-$m" % "0.23.27"
+    } ++ Seq("doobie-core", "doobie-hikari").map { d =>
+      "org.tpolecat" %% d % "1.0.0-RC5"
+    } ++ Seq(
+      "ch.qos.logback" % "logback-classic" % logbackVersion,
+      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.41.4" % Test,
+      "org.scalameta" %% "munit" % "1.0.1" % Test
     )
   )
 
@@ -46,7 +53,7 @@ val docs = project
 val docs3 = project
   .in(file("mdoc3"))
   .enablePlugins(MdocPlugin)
-  .dependsOn(code3)
+  .dependsOn(code3, code3 % "compile->test")
   .settings(
     organization := "com.malliina",
     scalaVersion := scala3,
@@ -73,7 +80,7 @@ val content = project
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     scalaVersion := scala3,
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % "1.5.6",
+      "ch.qos.logback" % "logback-classic" % logbackVersion,
       "com.malliina" %% "primitives" % "3.7.3",
       "com.lihaoyi" %% "scalatags" % "0.13.1",
       "com.typesafe" % "config" % "1.4.3",
