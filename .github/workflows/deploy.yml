@@ -20,11 +20,11 @@ jobs:
           java-version: 17
           cache: sbt
       - uses: sbt/setup-sbt@v1
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 18
       - name: Install Netlify CLI
-        run: npm install netlify-cli -g
+        run: npm install netlify-cli@17.38.1 -g
       - name: Run tests
         run: sbt test
       - name: Deploy site
