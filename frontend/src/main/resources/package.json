@@ -6,8 +6,5 @@
   },
   "scripts": {
     "build": "rollup --config rollup.config.ts --bundleConfigAsCjs --configPlugin typescript"
-  },
-  "devDependencies": {
-    "netlify-cli": "17.38.1"
   }
 }
