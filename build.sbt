@@ -1,10 +1,13 @@
 import play.sbt.PlayImport
 import java.nio.file.Path
 
-val scala213 = "2.13.14"
-val scala3 = "3.4.2"
-val logbackVersion = "1.5.7"
-
+val scala213 = "2.13.15"
+val scala3 = "3.6.2"
+val doobieVersion = "1.0.0-RC6"
+val logbackVersion = "1.5.14"
+val http4sVersion = "0.23.30"
+val munitVersion = "1.0.3"
+val testContainersVersion = "0.41.5"
 val docsDir = settingKey[File]("Docs target dir")
 
 val code = project
@@ -13,13 +16,13 @@ val code = project
   .settings(
     scalaVersion := scala213,
     libraryDependencies ++= Seq("ember-server", "dsl").map { m =>
-      "org.http4s" %% s"http4s-$m" % "0.23.27"
+      "org.http4s" %% s"http4s-$m" % http4sVersion
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
-      "org.tpolecat" %% d % "1.0.0-RC5"
+      "org.tpolecat" %% d % doobieVersion
     } ++ Seq(
       PlayImport.ws,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.41.4" % Test,
-      "org.scalameta" %% "munit" % "1.0.1" % Test
+      "com.dimafeng" %% "testcontainers-scala-mysql" % testContainersVersion % Test,
+      "org.scalameta" %% "munit" % munitVersion % Test
     )
   )
 
@@ -28,13 +31,13 @@ val code3 = project
   .settings(
     scalaVersion := scala3,
     libraryDependencies ++= Seq("ember-server", "dsl").map { m =>
-      "org.http4s" %% s"http4s-$m" % "0.23.27"
+      "org.http4s" %% s"http4s-$m" % http4sVersion
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
-      "org.tpolecat" %% d % "1.0.0-RC5"
+      "org.tpolecat" %% d % doobieVersion
     } ++ Seq(
       "ch.qos.logback" % "logback-classic" % logbackVersion,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % "0.41.4" % Test,
-      "org.scalameta" %% "munit" % "1.0.1" % Test
+      "com.dimafeng" %% "testcontainers-scala-mysql" % testContainersVersion % Test,
+      "org.scalameta" %% "munit" % munitVersion % Test
     )
   )
 
@@ -81,7 +84,7 @@ val content = project
     scalaVersion := scala3,
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % logbackVersion,
-      "com.malliina" %% "primitives" % "3.7.3",
+      "com.malliina" %% "primitives" % "3.7.4",
       "com.lihaoyi" %% "scalatags" % "0.13.1",
       "com.typesafe" % "config" % "1.4.3",
       "com.vladsch.flexmark" % "flexmark" % "0.64.8"
