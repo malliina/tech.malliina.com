@@ -23,10 +23,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - name: Install Netlify CLI
+        run: npm install netlify-cli -g
       - name: Run tests
         run: sbt test
       - name: Deploy site
-        uses: South-Paw/action-netlify-cli@v2
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
