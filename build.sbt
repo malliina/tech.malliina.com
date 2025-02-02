@@ -1,13 +1,13 @@
 import play.sbt.PlayImport
 import java.nio.file.Path
 
-val scala213 = "2.13.15"
+val scala213 = "2.13.16"
 val scala3 = "3.6.2"
 val doobieVersion = "1.0.0-RC6"
-val logbackVersion = "1.5.14"
+val logbackVersion = "1.5.16"
 val http4sVersion = "0.23.30"
-val munitVersion = "1.0.3"
-val testContainersVersion = "0.41.5"
+val munitVersion = "1.1.0"
+val testContainersVersion = "0.41.8"
 val docsDir = settingKey[File]("Docs target dir")
 
 val code = project
@@ -84,7 +84,7 @@ val content = project
     scalaVersion := scala3,
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % logbackVersion,
-      "com.malliina" %% "primitives" % "3.7.4",
+      "com.malliina" %% "primitives" % "3.7.6",
       "com.lihaoyi" %% "scalatags" % "0.13.1",
       "com.typesafe" % "config" % "1.4.3",
       "com.vladsch.flexmark" % "flexmark" % "0.64.8"
