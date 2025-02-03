@@ -1,4 +1,5 @@
 import play.sbt.PlayImport
+
 import java.nio.file.Path
 
 val scala213 = "2.13.16"
@@ -77,9 +78,10 @@ val watchMarkdown = taskKey[Seq[Path]]("Lists files.")
 
 val content = project
   .in(file("content"))
-  .enablePlugins(NetlifyPlugin)
+  .enablePlugins(NetlifyApiPlugin, GeneratorPlugin)
   .settings(
     scalajsProject := frontend,
+    netlifyRoot := (frontend / assetsRoot).value,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     scalaVersion := scala3,
     libraryDependencies ++= Seq(
@@ -107,7 +109,7 @@ val blog = project
   .in(file("."))
   .aggregate(docs, frontend, content)
   .settings(
-    deploy := (content / deploy).value,
+    deployNetlify := (content / deployNetlify).value,
     build := (content / build).value
   )
 

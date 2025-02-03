@@ -23,12 +23,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: Install Netlify CLI
-        run: npm install netlify-cli@17.38.1 -g
       - name: Run tests
         run: sbt test
       - name: Deploy site
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: sbt "mode prod" deploy
+        run: sbt "mode prod" content/deployNetlify
