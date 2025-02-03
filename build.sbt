@@ -81,7 +81,6 @@ val content = project
   .enablePlugins(NetlifyApiPlugin, GeneratorPlugin)
   .settings(
     scalajsProject := frontend,
-    netlifyRoot := (frontend / assetsRoot).value,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
     scalaVersion := scala3,
     libraryDependencies ++= Seq(
@@ -109,7 +108,7 @@ val blog = project
   .in(file("."))
   .aggregate(docs, frontend, content)
   .settings(
-    deployNetlify := (content / deployNetlify).value,
+    deploy := (content / deploy).value,
     build := (content / build).value
   )
 

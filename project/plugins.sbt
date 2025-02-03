@@ -1,11 +1,8 @@
 scalaVersion := "2.12.20"
-val utilsVersion = "1.6.43"
-
-lazy val netlify = RootProject(file("../netlify"))
+val utilsVersion = "1.6.45"
 
 lazy val root = project
   .in(file("."))
-  .dependsOn(netlify)
   .settings(
     Seq(
       "com.typesafe.play" % "sbt-plugin" % "2.9.2",
