@@ -2,43 +2,46 @@ import play.sbt.PlayImport
 
 import java.nio.file.Path
 
-val scala213 = "2.13.16"
-val scala3 = "3.6.2"
-val doobieVersion = "1.0.0-RC6"
-val logbackVersion = "1.5.16"
-val http4sVersion = "0.23.30"
-val munitVersion = "1.1.0"
-val testContainersVersion = "0.41.8"
+val versions = new {
+  val scala213 = "2.13.16"
+  val scala3 = "3.6.2"
+  val doobie = "1.0.0-RC6"
+  val logback = "1.5.16"
+  val http4s = "0.23.30"
+  val munit = "1.1.0"
+  val testContainers = "0.41.8"
+}
+
 val docsDir = settingKey[File]("Docs target dir")
 
 val code = project
   .in(file("code"))
   .enablePlugins(PlayScala)
   .settings(
-    scalaVersion := scala213,
+    scalaVersion := versions.scala213,
     libraryDependencies ++= Seq("ember-server", "dsl").map { m =>
-      "org.http4s" %% s"http4s-$m" % http4sVersion
+      "org.http4s" %% s"http4s-$m" % versions.http4s
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
-      "org.tpolecat" %% d % doobieVersion
+      "org.tpolecat" %% d % versions.doobie
     } ++ Seq(
       PlayImport.ws,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % testContainersVersion % Test,
-      "org.scalameta" %% "munit" % munitVersion % Test
+      "com.dimafeng" %% "testcontainers-scala-mysql" % versions.testContainers % Test,
+      "org.scalameta" %% "munit" % versions.munit % Test
     )
   )
 
 val code3 = project
   .in(file("code3"))
   .settings(
-    scalaVersion := scala3,
+    scalaVersion := versions.scala3,
     libraryDependencies ++= Seq("ember-server", "dsl").map { m =>
-      "org.http4s" %% s"http4s-$m" % http4sVersion
+      "org.http4s" %% s"http4s-$m" % versions.http4s
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
-      "org.tpolecat" %% d % doobieVersion
+      "org.tpolecat" %% d % versions.doobie
     } ++ Seq(
-      "ch.qos.logback" % "logback-classic" % logbackVersion,
-      "com.dimafeng" %% "testcontainers-scala-mysql" % testContainersVersion % Test,
-      "org.scalameta" %% "munit" % munitVersion % Test
+      "ch.qos.logback" % "logback-classic" % versions.logback,
+      "com.dimafeng" %% "testcontainers-scala-mysql" % versions.testContainers % Test,
+      "org.scalameta" %% "munit" % versions.munit % Test
     )
   )
 
@@ -48,7 +51,7 @@ val docs = project
   .dependsOn(code, code % "compile->test")
   .settings(
     organization := "com.malliina",
-    scalaVersion := scala213,
+    scalaVersion := versions.scala213,
     publish / skip := true,
     mdocVariables := Map("NAME" -> name.value, "VERSION" -> version.value),
     mdocOut := (ThisBuild / baseDirectory).value / "target" / "docs"
@@ -60,7 +63,7 @@ val docs3 = project
   .dependsOn(code3, code3 % "compile->test")
   .settings(
     organization := "com.malliina",
-    scalaVersion := scala3,
+    scalaVersion := versions.scala3,
     publish / skip := true,
     mdocVariables := Map("NAME" -> name.value, "VERSION" -> version.value),
     mdocIn := (ThisBuild / baseDirectory).value / "docs-scala3",
@@ -71,7 +74,7 @@ val frontend = project
   .in(file("frontend"))
   .enablePlugins(NodeJsPlugin, RollupPlugin)
   .settings(
-    scalaVersion := scala3
+    scalaVersion := versions.scala3
   )
 
 val watchMarkdown = taskKey[Seq[Path]]("Lists files.")
@@ -82,10 +85,10 @@ val content = project
   .settings(
     scalajsProject := frontend,
     copyFolders += ((Compile / resourceDirectory).value / "public").toPath,
-    scalaVersion := scala3,
+    scalaVersion := versions.scala3,
     libraryDependencies ++= Seq(
-      "ch.qos.logback" % "logback-classic" % logbackVersion,
-      "com.malliina" %% "primitives" % "3.7.6",
+      "ch.qos.logback" % "logback-classic" % versions.logback,
+      "com.malliina" %% "primitives" % "3.7.7",
       "com.lihaoyi" %% "scalatags" % "0.13.1",
       "com.typesafe" % "config" % "1.4.3",
       "com.vladsch.flexmark" % "flexmark" % "0.64.8"
