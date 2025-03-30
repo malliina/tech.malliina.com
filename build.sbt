@@ -6,10 +6,10 @@ val versions = new {
   val scala213 = "2.13.16"
   val scala3 = "3.6.2"
   val doobie = "1.0.0-RC6"
-  val logback = "1.5.16"
+  val logback = "1.5.18"
   val http4s = "0.23.30"
   val munit = "1.1.0"
-  val testContainers = "0.41.8"
+  val testContainers = "0.43.0"
 }
 
 val docsDir = settingKey[File]("Docs target dir")
@@ -101,9 +101,8 @@ val content = project
       "docsDir" -> docsDir.value
     ),
     watchMarkdown / fileInputs += (docs3 / mdocIn).value.toGlob / "*.md",
-    watchMarkdown := {
-      watchMarkdown.inputFiles
-    },
+    watchMarkdown :=
+      watchMarkdown.inputFiles,
     build := build.triggeredBy(watchMarkdown).value
   )
 
