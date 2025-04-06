@@ -27,7 +27,7 @@ object Generator:
         .toList
     val domain = Pages.domain
     // Only includes markdown files with metadata
-    val markdownPages = mds.flatMap: markdownFile =>
+    val written = mds.map: markdownFile =>
       val post = MarkdownPost(markdownFile)
       val html = MarkdownConverter.toHtml(post.content)
       val noExt = markdownFile.getFileName.toString.dropRight(ext.length)
@@ -35,12 +35,17 @@ object Generator:
       val url = domain / noExt
       val page = pages.page(post.title, post.meta.flatMap(_.cls), url, html)
       val htmlFile = page.write(out)
-      // Overwrites the HTML with a highlighted version
-      val highlighted =
-        IO.run(s"npm run highlighter -- ${htmlFile.toAbsolutePath}", cwd = BuildInfo.npmRoot.toPath)
       // Pages without a meta section will be included in the site but excluded from the list of pages
-      post.meta.map: meta =>
+      val mdPage = post.meta.map: meta =>
         MarkdownPage(htmlFile, meta.title, url, meta.date, meta.updated)
+      (htmlFile, mdPage)
+    FileIO.writeLines(
+      written.map((file, _) => file.toAbsolutePath.toString),
+      BuildInfo.npmRoot.toPath.resolve("pages.txt")
+    )
+    // Overwrites the HTML with a highlighted version
+    val highlighted = IO.run(s"npm run highlighter", cwd = BuildInfo.npmRoot.toPath)
+    val markdownPages = written.flatMap((_, md) => md)
     val newestFirst = markdownPages.sortBy(_.date.toEpochDay).reverse
     val listUrl = domain / pages.remoteListUri
     val listPage = pages.list("Posts", listUrl, newestFirst)

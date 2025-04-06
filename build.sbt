@@ -79,7 +79,10 @@ val highlighter = project
   .settings(
     scalaVersion := versions.scala3,
     scalaJSUseMainModuleInitializer := true,
-    scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
+    scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
+    libraryDependencies ++= Seq(
+      "org.scala-js" %%% "scalajs-dom" % "2.8.0"
+    )
   )
 
 val frontend = project
@@ -88,8 +91,8 @@ val frontend = project
   .settings(
     scalaVersion := versions.scala3,
     copyHighlightScript := FileIO.copyIfChanged(
-      (Compile / resourceDirectory).value.toPath.resolve("highlighter.ts"),
-      (Compile / npmRoot).value.resolve("highlighter.ts")
+      (highlighter / Compile / fastLinkJSOutput).value.toPath.resolve("main.js"),
+      (Compile / npmRoot).value.resolve("highlighter.js")
     )
   )
 
