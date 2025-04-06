@@ -1,3 +1,4 @@
+import com.malliina.build.FileIO
 import play.sbt.PlayImport
 
 import java.nio.file.Path
@@ -70,14 +71,21 @@ val docs3 = project
     mdocOut := (ThisBuild / baseDirectory).value / "target" / "docs"
   )
 
+val copyHighlightScript = taskKey[Boolean]("Copies file")
+
 val frontend = project
   .in(file("frontend"))
   .enablePlugins(NodeJsPlugin, RollupPlugin)
   .settings(
-    scalaVersion := versions.scala3
+    scalaVersion := versions.scala3,
+    copyHighlightScript := FileIO.copyIfChanged(
+      (Compile / resourceDirectory).value.toPath.resolve("highlight.js"),
+      (Compile / npmRoot).value.resolve("highlight.js")
+    )
   )
 
 val watchMarkdown = taskKey[Seq[Path]]("Lists files.")
+val highlight = taskKey[Unit]("Highlights generated HTML")
 
 val content = project
   .in(file("content"))
@@ -94,16 +102,25 @@ val content = project
       "com.vladsch.flexmark" % "flexmark" % "0.64.8"
     ),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
-    build := build.dependsOn((docs / mdoc).toTask(""), (docs3 / mdoc).toTask("")).value,
+    build := build
+      .dependsOn(
+        (docs / mdoc).toTask(""),
+        (docs3 / mdoc).toTask(""),
+        frontend / copyHighlightScript
+      )
+      .value,
     build / fileInputs ++= Seq((docs3 / mdocIn).value, (docs / mdocIn).value)
       .map(d => d.toGlob / "*.md"),
     buildInfoKeys ++= Seq[BuildInfoKey](
-      "docsDir" -> docsDir.value
+      "docsDir" -> docsDir.value,
+      "npmRoot" -> (frontend / npmRoot).value.toFile
     ),
     watchMarkdown / fileInputs += (docs3 / mdocIn).value.toGlob / "*.md",
-    watchMarkdown :=
-      watchMarkdown.inputFiles,
-    build := build.triggeredBy(watchMarkdown).value
+    watchMarkdown := watchMarkdown.inputFiles,
+    build := build.triggeredBy(watchMarkdown).value,
+    highlight :=
+      RollupPlugin
+        .process(Seq("npm", "run", "highlight"), (frontend / npmRoot).value, streams.value.log)
   )
 
 val blog = project

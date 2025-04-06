@@ -10,7 +10,7 @@ lazy val root = project
       "com.malliina" % "sbt-utils-maven" % utilsVersion,
       "com.malliina" % "sbt-nodejs" % utilsVersion,
       "com.malliina" % "sbt-revolver-rollup" % utilsVersion,
-      "org.scalameta" % "sbt-mdoc" % "2.6.2",
+      "org.scalameta" % "sbt-mdoc" % "2.6.5",
       "org.scalameta" % "sbt-scalafmt" % "2.5.4",
       "com.eed3si9n" % "sbt-buildinfo" % "0.13.1"
     ) map addSbtPlugin
