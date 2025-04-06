@@ -1,8 +1,9 @@
-const fs = require('node:fs');
-const hljs = require('highlight.js');
+import fs from 'node:fs';
+import hljs from 'highlight.js';
 hljs.configure({ignoreUnescapedHTML: true, throwUnescapedHTML: true});
-const parser = require('node-html-parser');
-hljs.registerLanguage("scala", require("highlight.js/lib/languages/scala"));
+import parser from 'node-html-parser';
+import scala from 'highlight.js/lib/languages/scala';
+hljs.registerLanguage("scala", scala);
 const inputFile = process.argv.at(2)
 const data = fs.readFileSync(inputFile, 'utf8');
 const doc = parser.parse(data);

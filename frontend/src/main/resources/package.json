@@ -7,11 +7,12 @@
     "npm-check-updates": "17.1.14",
     "@types/node": "22.14.0",
     "node-html-parser": "7.0.1",
-    "highlight.js": "11.11.1"
+    "highlight.js": "11.11.1",
+    "ts-node": "10.9.2"
   },
   "scripts": {
     "build": "rollup --config rollup.config.ts --bundleConfigAsCjs --configPlugin typescript",
-    "highlight": "node highlight.js",
+    "highlighter": "ts-node highlighter.ts",
     "ncu": "ncu"
   }
 }

@@ -73,19 +73,27 @@ val docs3 = project
 
 val copyHighlightScript = taskKey[Boolean]("Copies file")
 
+val highlighter = project
+  .in(file("highlighter"))
+  .enablePlugins(ScalaJSPlugin)
+  .settings(
+    scalaVersion := versions.scala3,
+    scalaJSUseMainModuleInitializer := true,
+    scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
+  )
+
 val frontend = project
   .in(file("frontend"))
   .enablePlugins(NodeJsPlugin, RollupPlugin)
   .settings(
     scalaVersion := versions.scala3,
     copyHighlightScript := FileIO.copyIfChanged(
-      (Compile / resourceDirectory).value.toPath.resolve("highlight.js"),
-      (Compile / npmRoot).value.resolve("highlight.js")
+      (Compile / resourceDirectory).value.toPath.resolve("highlighter.ts"),
+      (Compile / npmRoot).value.resolve("highlighter.ts")
     )
   )
 
 val watchMarkdown = taskKey[Seq[Path]]("Lists files.")
-val highlight = taskKey[Unit]("Highlights generated HTML")
 
 val content = project
   .in(file("content"))
@@ -117,10 +125,7 @@ val content = project
     ),
     watchMarkdown / fileInputs += (docs3 / mdocIn).value.toGlob / "*.md",
     watchMarkdown := watchMarkdown.inputFiles,
-    build := build.triggeredBy(watchMarkdown).value,
-    highlight :=
-      RollupPlugin
-        .process(Seq("npm", "run", "highlight"), (frontend / npmRoot).value, streams.value.log)
+    build := build.triggeredBy(watchMarkdown).value
   )
 
 val blog = project
