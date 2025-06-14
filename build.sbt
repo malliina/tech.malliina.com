@@ -5,11 +5,16 @@ import java.nio.file.Path
 
 val versions = new {
   val scala213 = "2.13.16"
-  val scala3 = "3.6.2"
+  val scala3 = "3.7.1"
+  val config = "1.4.3"
   val doobie = "1.0.0-RC6"
+  val flexmark = "0.64.8"
   val logback = "1.5.18"
   val http4s = "0.23.30"
-  val munit = "1.1.0"
+  val munit = "1.1.1"
+  val primitives = "3.7.10"
+  val scalajsDom = "2.8.0"
+  val scalatags = "0.13.1"
   val testContainers = "0.43.0"
 }
 
@@ -81,7 +86,7 @@ val highlighter = project
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "2.8.0"
+      "org.scala-js" %%% "scalajs-dom" % versions.scalajsDom
     )
   )
 
@@ -107,10 +112,10 @@ val content = project
     scalaVersion := versions.scala3,
     libraryDependencies ++= Seq(
       "ch.qos.logback" % "logback-classic" % versions.logback,
-      "com.malliina" %% "primitives" % "3.7.7",
-      "com.lihaoyi" %% "scalatags" % "0.13.1",
-      "com.typesafe" % "config" % "1.4.3",
-      "com.vladsch.flexmark" % "flexmark" % "0.64.8"
+      "com.malliina" %% "primitives" % versions.primitives,
+      "com.lihaoyi" %% "scalatags" % versions.scalatags,
+      "com.typesafe" % "config" % versions.config,
+      "com.vladsch.flexmark" % "flexmark" % versions.flexmark
     ),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
     build := build
