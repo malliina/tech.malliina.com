@@ -10,5 +10,5 @@ object CacheControl extends StringCompanion[CacheControl]:
 object CacheControls extends CacheControls
 
 trait CacheControls:
-  val defaultCacheControl = CacheControl("public, max-age=2592000")
+  val defaultCacheControl = CacheControl("public, max-age=0")
   val eternalCache = CacheControl("public, max-age=31536000")
