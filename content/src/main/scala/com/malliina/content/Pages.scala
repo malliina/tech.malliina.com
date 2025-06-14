@@ -36,29 +36,33 @@ class Pages(local: Boolean):
 
   def page(title: String, cls: Option[String], url: FullUrl, content: Html): TagPage =
     val classes = Seq("content") ++ cls.toList
-    index(title, url)(
+    index(title, url, Nil)(
       div(`class` := classes.mkString(" "))(content),
       footer(a(href := listUri)("Archive"))
     )
 
-  def list(title: String, url: FullUrl, pages: Seq[MarkdownPage]) = index(title, url)(
-    div(`class` := "content")(
-      h1("Posts"),
-      ul(
-        pages.map: page =>
-          val itemUri = if local then page.name else page.noExt
-          li(`class` := "post-item")(
-            a(href := itemUri)(page.title),
-            format(page.date, page.updated)
-          )
+  def list(title: String, url: FullUrl, pages: Seq[MarkdownPage]) =
+    val prefetches = pages.map(_.url)
+    index(title, url, prefetches)(
+      div(`class` := "content")(
+        h1("Posts"),
+        ul(
+          pages.map: page =>
+            val itemUri = if local then page.name else page.noExt
+            li(`class` := "post-item")(
+              a(href := itemUri)(page.title),
+              format(page.date, page.updated)
+            )
+        )
+      ),
+      footer(
+        a(href := "https://github.com/malliina")("GitHub")
       )
-    ),
-    footer(
-      a(href := "https://github.com/malliina")("GitHub")
     )
-  )
 
-  def index(titleText: String, url: FullUrl)(contents: Modifier*): TagPage = TagPage(
+  def index(titleText: String, url: FullUrl, prefetches: Seq[FullUrl])(
+    contents: Modifier*
+  ): TagPage = TagPage(
     html(lang := "en")(
       head(
         titleTag(titleText),
@@ -76,6 +80,8 @@ class Pages(local: Boolean):
         meta(property := "og:title", content := titleText),
         meta(property := "og:description", content := globalDescription),
         link(rel := "canonical", href := url),
+        prefetches.map: prefetch =>
+          link(rel := "prefetch", href := prefetch),
         link(
           rel := "shortcut icon",
           `type` := "image/jpeg",
