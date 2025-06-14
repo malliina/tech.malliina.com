@@ -39,7 +39,7 @@ class NetlifyClient:
   def writeRedirects(rs: Seq[RedirectEntry], dir: Path) =
     writeLines(rs.map(_.asString), dir.resolve("_redirects"))
 
-  def cached(dir: Path): Seq[WebsiteFile] =
+  private def cached(dir: Path): Seq[WebsiteFile] =
     Files
       .walk(dir)
       .iterator()
@@ -60,7 +60,6 @@ class NetlifyClient:
         s"/${file.uri}",
         Map(
           CacheControl.headerName -> file.cacheControl.value
-//          "Content-Type" -> file.contentType.value
         )
       )
     writeLines(netlifyHeaders.map(_.asString), to)
