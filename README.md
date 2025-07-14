@@ -15,8 +15,7 @@ This is the site [tech.malliina.com](https://tech.malliina.com).
 
 To run locally:
 
-    sbt
-    ~build
+    sbt ~build
 
 Navigate to http://localhost:10101/list.html.
 

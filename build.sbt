@@ -1,4 +1,5 @@
 import com.malliina.build.FileIO
+import com.malliina.rollup.EsbuildPlugin.autoImport.npmRoot
 import play.sbt.PlayImport
 
 import java.nio.file.Path
@@ -92,7 +93,7 @@ val highlighter = project
 
 val frontend = project
   .in(file("frontend"))
-  .enablePlugins(NodeJsPlugin, RollupPlugin)
+  .enablePlugins(NodeJsPlugin, EsbuildPlugin)
   .settings(
     scalaVersion := versions.scala3,
     copyHighlightScript := FileIO.copyIfChanged(

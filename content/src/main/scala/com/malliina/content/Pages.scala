@@ -28,9 +28,7 @@ class Pages(local: Boolean):
   val remoteListUri = "list"
   val listUri = if local then "list.html" else remoteListUri
 
-  private val scripts =
-    if local then Seq(FileAssets.frontend_js, FileAssets.frontend_loader_js, FileAssets.main_js)
-    else Seq(FileAssets.frontend_js)
+  private val scripts = Seq(FileAssets.main_js)
 
   private val globalDescription = "Posts on Scala, programming, and other tech topics."
 
@@ -87,8 +85,7 @@ class Pages(local: Boolean):
           `type` := "image/jpeg",
           href := inlineOrAsset(FileAssets.img.jag_jpg)
         ),
-        styleAt(FileAssets.fonts_css),
-        styleAt(FileAssets.styles_css),
+        styleAt(FileAssets.main_css),
         if local then script(src := LiveReload.script) else modifier()
       ),
       body(
