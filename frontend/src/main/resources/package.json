@@ -10,7 +10,6 @@
     "npm-check-updates": "17.1.14"
   },
   "scripts": {
-    "build": "rollup --config rollup.config.ts --bundleConfigAsCjs --configPlugin typescript",
     "highlighter": "node highlighter.js",
     "ncu": "ncu"
   }

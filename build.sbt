@@ -4,15 +4,15 @@ import play.sbt.PlayImport
 import java.nio.file.Path
 
 val versions = new {
-  val scala213 = "2.13.16"
-  val scala3 = "3.7.1"
-  val config = "1.4.3"
+  val scala213 = "2.13.18"
+  val scala3 = "3.8.2"
+  val config = "1.4.6"
   val doobie = "1.0.0-RC6"
   val flexmark = "0.64.8"
-  val logback = "1.5.18"
+  val logback = "1.5.32"
   val http4s = "0.23.30"
   val munit = "1.1.1"
-  val primitives = "3.7.10"
+  val primitives = "6.13.0"
   val scalajsDom = "2.8.0"
   val scalatags = "0.13.1"
   val testContainers = "0.43.0"
@@ -92,12 +92,13 @@ val highlighter = project
 
 val frontend = project
   .in(file("frontend"))
-  .enablePlugins(NodeJsPlugin, RollupPlugin)
+  .enablePlugins(NodeJsPlugin, EsbuildPlugin)
   .settings(
     scalaVersion := versions.scala3,
     copyHighlightScript := FileIO.copyIfChanged(
       (highlighter / Compile / fastLinkJSOutput).value.toPath.resolve("main.js"),
-      (Compile / npmRoot).value.resolve("highlighter.js")
+      (Compile / com.malliina.rollup.EsbuildPlugin.autoImport.npmRoot).value
+        .resolve("highlighter.js")
     )
   )
 
@@ -129,7 +130,7 @@ val content = project
       .map(d => d.toGlob / "*.md"),
     buildInfoKeys ++= Seq[BuildInfoKey](
       "docsDir" -> docsDir.value,
-      "npmRoot" -> (frontend / npmRoot).value.toFile
+      "npmRoot" -> (frontend / com.malliina.rollup.EsbuildPlugin.autoImport.npmRoot).value.toFile
     ),
     watchMarkdown / fileInputs += (docs3 / mdocIn).value.toGlob / "*.md",
     watchMarkdown := watchMarkdown.inputFiles,
