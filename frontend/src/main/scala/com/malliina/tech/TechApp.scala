@@ -4,21 +4,11 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSImport
 
 object TechApp:
-  val fontsCss = FontsCss
-  val mainCss = MainCss
-  val monokaiCss = MonokaiCss
+  val appCss = AppCss
 
   def main(args: Array[String]): Unit =
     println("Hej")
 
 @js.native
-@JSImport("./css/main.css", JSImport.Namespace)
-object MainCss extends js.Object
-
-@js.native
-@JSImport("./css/fonts.css", JSImport.Namespace)
-object FontsCss extends js.Object
-
-@js.native
-@JSImport("./css/monokai.css", JSImport.Namespace)
-object MonokaiCss extends js.Object
+@JSImport("./css/app", JSImport.Namespace)
+object AppCss extends js.Object
