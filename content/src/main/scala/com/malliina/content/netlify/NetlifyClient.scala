@@ -39,7 +39,7 @@ class NetlifyClient:
   def writeRedirects(rs: Seq[RedirectEntry], dir: Path) =
     writeLines(rs.map(_.asString), dir.resolve("_redirects"))
 
-  def cached(dir: Path): Seq[WebsiteFile] =
+  private def cached(dir: Path): Seq[WebsiteFile] =
     Files
       .walk(dir)
       .iterator()
@@ -54,15 +54,20 @@ class NetlifyClient:
           else CacheControls.defaultCacheControl
         WebsiteFile(relative, cache)
 
+  private val htmlExt = ".html"
+
   private def writeHeadersFile(files: Seq[WebsiteFile], to: Path): Path =
-    val netlifyHeaders = NetlifyHeader.security +: files.map: file =>
-      NetlifyHeader(
-        s"/${file.uri}",
-        Map(
-          CacheControl.headerName -> file.cacheControl.value
-//          "Content-Type" -> file.contentType.value
+    val netlifyHeaders = NetlifyHeader.security +: files.flatMap: file =>
+      val shortcut =
+        if file.uri.endsWith(htmlExt) then Option(file.uri.stripSuffix(htmlExt)) else None
+      val uris = Seq(file.uri) ++ shortcut.toList
+      uris.map: uri =>
+        NetlifyHeader(
+          s"/$uri",
+          Map(
+            CacheControl.headerName -> file.cacheControl.value
+          )
         )
-      )
     writeLines(netlifyHeaders.map(_.asString), to)
 
   def writeLines(lines: Seq[String], to: Path) =

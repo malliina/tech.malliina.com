@@ -1,4 +1,3 @@
 import "./main.css"
 import "./monokai.css"
-
-console.log("Styles only.")
+import "./fonts.css"

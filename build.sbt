@@ -1,4 +1,5 @@
 import com.malliina.build.FileIO
+import com.malliina.rollup.EsbuildPlugin.autoImport.npmRoot
 import play.sbt.PlayImport
 
 import java.nio.file.Path
