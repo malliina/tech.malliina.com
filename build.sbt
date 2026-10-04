@@ -112,7 +112,7 @@ val content = project
       "com.vladsch.flexmark" % "flexmark" % versions.flexmark
     ),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
-    writeFileTree := Def.uncached(writeFileTree.dependsOn(frontend / build).value),
+//    writeFileTree := Def.uncached(writeFileTree.dependsOn(frontend / build).value),
     build := build
       .dependsOn(
         (docs / mdoc).toTask(""),

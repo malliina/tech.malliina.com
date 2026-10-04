@@ -1,4 +1,4 @@
-val utilsVersion = "2.0.7-SNAPSHOT"
+val utilsVersion = "2.0.8"
 
 lazy val root = project
   .in(file("."))
