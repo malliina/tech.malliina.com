@@ -87,11 +87,12 @@ val frontend = project
   .enablePlugins(NodeJsPlugin, EsbuildPlugin)
   .settings(
     scalaVersion := versions.scala3,
-    copyHighlightScript := FileIO.copyIfChanged(
-      (highlighter / Compile / fastLinkJSOutput).value.toPath.resolve("main.js"),
-      (Compile / com.malliina.rollup.EsbuildPlugin.autoImport.npmRoot).value
-        .resolve("highlighter.js")
-    )
+    copyHighlightScript := Def.uncached:
+      FileIO.copyIfChanged(
+        (highlighter / Compile / fastLinkJSOutput).value.toPath.resolve("main.js"),
+        (Compile / com.malliina.rollup.EsbuildPlugin.autoImport.npmRoot).value
+          .resolve("highlighter.js")
+      )
   )
 
 val watchMarkdown = taskKey[Seq[Path]]("Lists files.")
