@@ -1,29 +1,18 @@
 import com.malliina.build.FileIO
 import com.malliina.rollup.EsbuildPlugin.autoImport.npmRoot
-import play.sbt.PlayImport
-
+import sbt.internal.FileChangesMacro.inputFiles
 import java.nio.file.Path
-
-val versions = new {
-  val scala213 = "2.13.18"
-  val scala3 = "3.8.2"
-  val config = "1.4.6"
-  val doobie = "1.0.0-RC6"
-  val flexmark = "0.64.8"
-  val logback = "1.5.32"
-  val http4s = "0.23.30"
-  val munit = "1.1.1"
-  val primitives = "6.13.0"
-  val scalajsDom = "2.8.0"
-  val scalatags = "0.13.1"
-  val testContainers = "0.43.0"
-}
 
 val docsDir = settingKey[File]("Docs target dir")
 
+inThisBuild(
+  Seq(
+    scalaVersion := versions.scala3
+  )
+)
+
 val code = project
   .in(file("code"))
-  .enablePlugins(PlayScala)
   .settings(
     scalaVersion := versions.scala213,
     libraryDependencies ++= Seq("ember-server", "dsl").map { m =>
@@ -31,7 +20,9 @@ val code = project
     } ++ Seq("doobie-core", "doobie-hikari").map { d =>
       "org.tpolecat" %% d % versions.doobie
     } ++ Seq(
-      PlayImport.ws,
+      "com.typesafe.play" %% "play" % versions.play,
+      "com.typesafe.play" %% "play-ahc-ws" % versions.play,
+      "com.typesafe.play" %% "play-test" % versions.play % Test,
       "com.dimafeng" %% "testcontainers-scala-mysql" % versions.testContainers % Test,
       "org.scalameta" %% "munit" % versions.munit % Test
     )
@@ -54,7 +45,7 @@ val code3 = project
 
 val docs = project
   .in(file("mdoc"))
-  .enablePlugins(MdocPlugin, PlayScala)
+  .enablePlugins(MdocPlugin)
   .dependsOn(code, code % "compile->test")
   .settings(
     organization := "com.malliina",
@@ -87,7 +78,7 @@ val highlighter = project
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) },
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % versions.scalajsDom
+      "org.scala-js" %% "scalajs-dom" % versions.scalajsDom
     )
   )
 
@@ -120,6 +111,7 @@ val content = project
       "com.vladsch.flexmark" % "flexmark" % versions.flexmark
     ),
     docsDir := (ThisBuild / baseDirectory).value / "target" / "docs",
+    writeFileTree := Def.uncached(writeFileTree.dependsOn(frontend / build).value),
     build := build
       .dependsOn(
         (docs / mdoc).toTask(""),
@@ -134,7 +126,7 @@ val content = project
       "npmRoot" -> (frontend / com.malliina.rollup.EsbuildPlugin.autoImport.npmRoot).value.toFile
     ),
     watchMarkdown / fileInputs += (docs3 / mdocIn).value.toGlob / "*.md",
-    watchMarkdown := watchMarkdown.inputFiles,
+    watchMarkdown := Def.uncached(watchMarkdown.inputFiles),
     build := build.triggeredBy(watchMarkdown).value
   )
 
