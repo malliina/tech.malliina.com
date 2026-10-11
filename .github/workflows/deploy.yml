@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 24
       - name: Run tests
-        run: sbt test
+        run: sbt "test;shutdown"
       - name: Deploy site
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
