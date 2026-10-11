@@ -5,6 +5,7 @@ import buildinfo.BuildInfo
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import com.malliina.content.netlify.{NetlifyClient, RedirectEntry}
+import io.circe.syntax.EncoderOps
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 
@@ -42,6 +43,10 @@ object Generator:
     FileIO.writeLines(
       written.map((file, _) => file.toAbsolutePath.toString),
       BuildInfo.npmRoot.toPath.resolve("pages.txt")
+    )
+    FileIO.write(
+      BuildMeta.default.asJson.spaces2.getBytes(StandardCharsets.UTF_8),
+      distDir.resolve("build.json")
     )
     // Overwrites the HTML with a highlighted version
     val highlighted = IO.run(s"npm run highlighter", cwd = BuildInfo.npmRoot.toPath)

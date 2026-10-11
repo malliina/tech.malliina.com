@@ -1,7 +1,9 @@
 package com.malliina.content
 
+import buildinfo.BuildInfo
 import com.malliina.http.FullUrl
 import com.typesafe.config.ConfigFactory
+import io.circe.Codec
 import scalatags.Text.all.*
 
 import java.nio.file.{Files, Path}
@@ -52,3 +54,8 @@ case class MarkdownPage(
   val dotIdx = name.lastIndexOf(".")
   val noExt = if dotIdx == -1 then name else name.substring(0, dotIdx)
   val uri = s"/$noExt"
+
+case class BuildMeta(gitHash: String) derives Codec.AsObject
+
+object BuildMeta:
+  val default = BuildMeta(BuildInfo.gitHash)
